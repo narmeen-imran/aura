@@ -1,12 +1,11 @@
 /* =========================================================
-   SECTION 1 — ONBOARDING + NAVIGATION + TODOS + DECKS
+   HELPERS + GLOBAL STATE
 ========================================================= */
 
 function $(id) {
   return document.getElementById(id);
 }
 
-/* GLOBAL STATE */
 let userName = localStorage.getItem("aura-username") || "";
 let userAge = localStorage.getItem("aura-age") || "";
 let userPurposes = JSON.parse(localStorage.getItem("aura-purposes") || "[]");
@@ -50,13 +49,16 @@ const timerDisplay = $("pomodoro-time");
 const hourInput = $("timer-hours");
 const minuteInput = $("timer-minutes");
 
-/* HELPERS */
+/* EVENT HELPER */
 function on(id, event, handler) {
   const el = $(id);
   if (el) el.addEventListener(event, handler);
 }
 
-/* SCREEN SWITCHING */
+/* =========================================================
+   SCREEN SWITCHING
+========================================================= */
+
 function showScreen(name) {
   document.querySelectorAll(".aura-screen").forEach(screen => {
     screen.classList.remove("is-active");
@@ -70,7 +72,10 @@ function showScreen(name) {
   });
 }
 
-/* ONBOARDING */
+/* =========================================================
+   ONBOARDING
+========================================================= */
+
 const onboardingScreen = $("onboarding-screen");
 
 on("onboarding-next-1", "click", () => {
@@ -108,7 +113,21 @@ on("onboarding-finish", "click", () => {
   $("home-greeting").textContent = `hello, ${userName}`;
 });
 
-/* NAVIGATION */
+/* BACK BUTTONS */
+document.querySelectorAll(".onboarding-back-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const backStep = btn.dataset.backStep;
+    document.querySelectorAll(".onboarding-card").forEach(card => {
+      card.style.display = "none";
+    });
+    document.querySelector(`[data-step="${backStep}"]`).style.display = "block";
+  });
+});
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
 document.querySelectorAll(".bottom-nav-item").forEach(btn => {
   btn.addEventListener("click", () => {
     const target = btn.dataset.screenTarget;
@@ -116,7 +135,10 @@ document.querySelectorAll(".bottom-nav-item").forEach(btn => {
   });
 });
 
-/* TODOS */
+/* =========================================================
+   TODOS
+========================================================= */
+
 function saveTodos() {
   localStorage.setItem("aura-todos", JSON.stringify(todos));
 }
@@ -156,31 +178,10 @@ on("todo-add-button", "click", () => {
   renderTodos();
 });
 
-/* SWIPE TO DELETE */
-let todoSwipeStartX = 0;
+/* =========================================================
+   DECKS + FLASHCARDS
+========================================================= */
 
-document.addEventListener("touchstart", e => {
-  const item = e.target.closest(".todo-item");
-  if (!item) return;
-  todoSwipeStartX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchend", e => {
-  const item = e.target.closest(".todo-item");
-  if (!item) return;
-
-  const endX = e.changedTouches[0].clientX;
-  if (todoSwipeStartX - endX > 50) {
-    const index = [...item.parentNode.children].indexOf(item);
-    if (index >= 0) {
-      todos.splice(index, 1);
-      saveTodos();
-      renderTodos();
-    }
-  }
-});
-
-/* DECKS + FLASHCARDS */
 function saveDecks() {
   localStorage.setItem("aura-decks", JSON.stringify(decks));
 }
@@ -373,7 +374,7 @@ on("delete-deck-button", "click", () => {
   showScreen("flashcards");
 });
 /* =========================================================
-   SECTION 2 — NOTES + EDITOR (FIXED) + SEARCH + TOOLBAR
+   NOTES (FIXED)
 ========================================================= */
 
 function saveNotes() {
@@ -530,8 +531,21 @@ document.querySelectorAll(".toolbar-button").forEach(btn => {
     document.execCommand(command, false, value);
   });
 });
+
 /* =========================================================
-   SECTION 3 — TIMER + STATS + INIT
+   THEME TOGGLE (FIXED)
+========================================================= */
+
+on("settings-theme-toggle", "click", () => {
+  const root = document.documentElement;
+  const current = root.getAttribute("data-theme");
+  const next = current === "light" ? "dark" : "light";
+  root.setAttribute("data-theme", next);
+  localStorage.setItem("aura-theme", next);
+});
+
+/* =========================================================
+   TIMER + STATS
 ========================================================= */
 
 function savePomodoroStats() {
@@ -543,7 +557,6 @@ function renderPomodoroStats() {
   $("pomodoro-stats-time").textContent = `focused time: ${Math.floor(pomodoroStats.seconds / 60)} min`;
 }
 
-/* TIMER RING */
 const ring = document.querySelector(".timer-ring-progress");
 const radius = 90;
 const circumference = 2 * Math.PI * radius;
@@ -567,7 +580,6 @@ function formatTime(sec) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/* START / PAUSE */
 on("pomodoro-toggle", "click", () => {
   if (timerInterval) {
     clearInterval(timerInterval);
@@ -616,7 +628,6 @@ on("pomodoro-toggle", "click", () => {
   }, 1000);
 });
 
-/* RESET */
 on("pomodoro-reset", "click", () => {
   clearInterval(timerInterval);
   timerInterval = null;
@@ -633,12 +644,20 @@ on("pomodoro-reset", "click", () => {
   $("pomodoro-toggle").textContent = "start";
 });
 
-/* INIT */
+/* =========================================================
+   INIT
+========================================================= */
+
 function init() {
   renderTodos();
   renderDecks();
   renderNotes();
   renderPomodoroStats();
+
+  const savedTheme = localStorage.getItem("aura-theme");
+  if (savedTheme) {
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }
 
   if (userName) {
     onboardingScreen.style.display = "none";
