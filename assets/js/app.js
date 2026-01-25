@@ -1,6 +1,18 @@
 /* =========================
-   GLOBAL STATE
+   SUPABASE CLIENT
 ========================= */
+
+// replace with your real values from Supabase
+const SUPABASE_URL = "https://hzybqwfqodfgpggluyur.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6eWJxd2Zxb2RmZ3BnZ2x1eXVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNTIzNjksImV4cCI6MjA4NDkyODM2OX0.1YapJ-rRTblIt_XDCy2i7aZEtMTYtc3lDoR1g9J1mAc";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =========================
+   STATE
+========================= */
+
+let user = null;
 
 let userName = localStorage.getItem("aura-name") || "";
 let userAge = localStorage.getItem("aura-age") || "";
@@ -17,9 +29,9 @@ let timerInterval = null;
 let totalSeconds = 1500;
 let remainingSeconds = totalSeconds;
 
-/* Timer ring setup */
+/* Timer ring */
 const ring = document.querySelector(".timer-ring-progress");
-const radius = 80;
+const radius = 70;
 const circumference = 2 * Math.PI * radius;
 
 if (ring) {
@@ -30,6 +42,11 @@ if (ring) {
 /* =========================
    ELEMENTS
 ========================= */
+
+const loginScreen = document.getElementById("login-screen");
+const loginEmailInput = document.getElementById("login-email");
+const loginButton = document.getElementById("login-button");
+const loginMessage = document.getElementById("login-message");
 
 const onboardingScreen = document.getElementById("onboarding-screen");
 const onboardingStepsContainer = document.querySelector(".onboarding-steps");
@@ -57,6 +74,67 @@ const hourInput = document.getElementById("timer-hours");
 const minuteInput = document.getElementById("timer-minutes");
 
 /* =========================
+   AUTH (MAGIC LINKS)
+========================= */
+
+loginButton?.addEventListener("click", async () => {
+  const email = (loginEmailInput.value || "").trim();
+  if (!email) {
+    loginMessage.textContent = "enter an email first.";
+    return;
+  }
+
+  loginMessage.textContent = "sending magic link...";
+  const { error } = await supabaseClient.auth.signInWithOtp({ email });
+
+  if (error) {
+    loginMessage.textContent = "something went wrong. try again.";
+  } else {
+    loginMessage.textContent = "magic link sent. check your email.";
+  }
+});
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if (session && session.user) {
+    user = session.user;
+    loginScreen.style.display = "none";
+    appRoot.style.display = "flex";
+
+    const greet = document.getElementById("home-greeting");
+    if (greet && userName) greet.textContent = `hello, ${userName}`;
+
+    if (!userName || !userAge || !userPurpose.length) {
+      onboardingScreen.style.display = "flex";
+      goToOnboardingStep(1);
+    }
+  } else {
+    user = null;
+    appRoot.style.display = "none";
+    loginScreen.style.display = "flex";
+  }
+});
+
+(async () => {
+  const { data } = await supabaseClient.auth.getSession();
+  if (data.session && data.session.user) {
+    user = data.session.user;
+    loginScreen.style.display = "none";
+    appRoot.style.display = "flex";
+
+    const greet = document.getElementById("home-greeting");
+    if (greet && userName) greet.textContent = `hello, ${userName}`;
+
+    if (!userName || !userAge || !userPurpose.length) {
+      onboardingScreen.style.display = "flex";
+      goToOnboardingStep(1);
+    }
+  } else {
+    loginScreen.style.display = "flex";
+    appRoot.style.display = "none";
+  }
+})();
+
+/* =========================
    ONBOARDING
 ========================= */
 
@@ -75,25 +153,11 @@ function goToOnboardingStep(step) {
 
 function finishOnboarding() {
   onboardingScreen.style.display = "none";
-  appRoot.style.display = "flex";
-
   const greet = document.getElementById("home-greeting");
   if (greet) greet.textContent = `hello, ${userName}`;
 }
 
-/* Initial onboarding state */
-if (!userName || !userAge || !userPurpose.length) {
-  onboardingScreen.style.display = "flex";
-  appRoot.style.display = "none";
-  goToOnboardingStep(1);
-} else {
-  onboardingScreen.style.display = "none";
-  appRoot.style.display = "flex";
-  const greet = document.getElementById("home-greeting");
-  if (greet) greet.textContent = `hello, ${userName}`;
-}
-
-/* Step 1: name */
+/* Step 1 */
 document.getElementById("onboarding-next-1")?.addEventListener("click", () => {
   const nameInput = document.getElementById("onboarding-name-input");
   const name = (nameInput?.value || "").trim();
@@ -104,7 +168,7 @@ document.getElementById("onboarding-next-1")?.addEventListener("click", () => {
   goToOnboardingStep(2);
 });
 
-/* Step 2: age */
+/* Step 2 */
 document.getElementById("onboarding-next-2")?.addEventListener("click", () => {
   const ageInput = document.getElementById("onboarding-age-input");
   const ageValue = (ageInput?.value || "").trim();
@@ -115,7 +179,7 @@ document.getElementById("onboarding-next-2")?.addEventListener("click", () => {
   goToOnboardingStep(3);
 });
 
-/* Step 3: purpose */
+/* Step 3 */
 document.getElementById("onboarding-finish")?.addEventListener("click", () => {
   const checks = document.querySelectorAll('input[name="purpose"]:checked');
   const selected = Array.from(checks).map(c => c.value);
@@ -175,7 +239,7 @@ navButtons.forEach(btn => {
 });
 
 /* =========================
-   TODO LIST
+   TODO LIST (local for now)
 ========================= */
 
 function saveTodos() {
@@ -216,7 +280,7 @@ document.getElementById("todo-add-button")?.addEventListener("click", () => {
 });
 
 /* =========================
-   FLASHCARDS
+   FLASHCARDS (local for now)
 ========================= */
 
 function saveDecks() {
@@ -377,7 +441,7 @@ document.getElementById("add-deck-button")?.addEventListener("click", () => {
 });
 
 /* =========================
-   NOTES
+   NOTES (local for now)
 ========================= */
 
 function saveNotes() {
@@ -532,6 +596,5 @@ document.getElementById("pomodoro-reset")?.addEventListener("click", () => {
   document.getElementById("pomodoro-toggle").textContent = "start";
 });
 
-/* Initial timer display */
 updateTimerDisplay();
 updateRing();

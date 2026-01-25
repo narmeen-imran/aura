@@ -3,22 +3,28 @@
   --text: #000000;
   --text-soft: #555555;
 
-  /* Frosted glass */
   --glass: rgba(255, 255, 255, 0.6);
   --glass-border: rgba(0, 0, 0, 0.08);
 
-  /* Deep royal purple gradient */
   --grad-start: #6a00ff;
   --grad-end: #b100ff;
 
-  /* Buttons */
   --btn-border: 1.5px;
 
-  /* Misc */
   --radius-lg: 22px;
   --radius-md: 16px;
   --radius-pill: 999px;
   --blur: 22px;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --bg: #000000;
+  --text: #ffffff;
+  --text-soft: #cccccc;
+
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.18);
 }
 
 /* RESET */
@@ -43,25 +49,57 @@ body {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  overflow: hidden;
+  overflow-y: auto; /* allow vertical scroll */
 }
 
 /* APP SHELL */
 #app-root {
   width: 100%;
   max-width: 480px;
-  height: 100vh;
-  display: flex;
+  min-height: 100vh;
+  display: none;
   flex-direction: column;
   background: var(--bg);
-  overflow: hidden;
+  position: relative;
+}
+
+/* LOGIN */
+#login-screen {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-inner {
+  width: 100%;
+  padding: 32px 22px;
+}
+
+.login-title {
+  font-size: 32px;
+  margin: 0 0 4px;
+}
+
+.login-subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.login-message {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-soft);
 }
 
 .app-main {
   flex: 1;
-  overflow-y: auto;
   padding: 16px;
-  padding-bottom: 100px; /* space above fixed navbar */
+  padding-bottom: 100px;
 }
 
 /* ONBOARDING */
@@ -114,10 +152,16 @@ body {
   border: 1px solid var(--glass-border);
   padding: 12px 16px;
   background: #ffffff;
-  color: var(--text);
-  font-size: 16px; /* prevents iPhone zoom */
+  color: #000000;
+  font-size: 16px;
 }
 
+[data-theme="dark"] .onboarding-input {
+  background: #111111;
+  color: #ffffff;
+}
+
+/* Checkbox pills */
 .checkbox-pill {
   display: inline-flex;
   align-items: center;
@@ -189,7 +233,7 @@ body {
   font-weight: 500;
 }
 
-/* BUTTONS — TRANSPARENT WITH GRADIENT BORDER */
+/* BUTTONS */
 .primary-button,
 .ghost-button,
 .icon-button {
@@ -225,7 +269,7 @@ body {
 .small { font-size: 12px; padding: 6px 10px; }
 .danger { color: #d00000; }
 
-/* NAVBAR — FIXED */
+/* NAVBAR */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -360,20 +404,24 @@ body {
   border-radius: 24px 24px 0 0;
   border-top: 1px solid var(--glass-border);
   padding: 16px;
-  padding-bottom: 90px; /* space for fixed save button */
+  padding-bottom: 90px;
   overflow-y: auto;
   max-height: 90vh;
 }
 
-/* Title input */
 .note-title-input {
   width: 100%;
   border-radius: var(--radius-pill);
   border: 1px solid var(--glass-border);
   padding: 10px 14px;
-  background: #fff;
-  color: var(--text);
+  background: #ffffff;
+  color: #000000;
   font-size: 16px;
+}
+
+[data-theme="dark"] .note-title-input {
+  background: #111111;
+  color: #ffffff;
 }
 
 /* Toolbar */
@@ -398,9 +446,14 @@ body {
   border-radius: var(--radius-md);
   border: 1px solid var(--glass-border);
   padding: 12px;
-  background: #fff;
-  color: var(--text);
+  background: #ffffff;
+  color: #000000;
   font-size: 16px;
+}
+
+[data-theme="dark"] .note-editor-content {
+  background: #111111;
+  color: #ffffff;
 }
 
 /* Fixed save button */
@@ -424,8 +477,8 @@ body {
 
 .timer-ring-wrapper {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 170px;
+  height: 170px;
 }
 
 .timer-ring {
@@ -446,14 +499,26 @@ body {
 }
 
 .timer-display {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 600;
 }
 
 .timer-inputs {
   display: flex;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 6px;
+}
+
+.timer-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.timer-input-group label {
+  font-size: 12px;
+  color: var(--text-soft);
 }
 
 .timer-input-group input {
@@ -461,9 +526,20 @@ body {
   border-radius: var(--radius-pill);
   border: 1px solid var(--glass-border);
   padding: 6px 10px;
-  background: #fff;
-  color: var(--text);
+  background: #ffffff;
+  color: #000000;
   font-size: 16px;
+}
+
+[data-theme="dark"] .timer-input-group input {
+  background: #111111;
+  color: #ffffff;
+}
+
+.timer-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 /* SCROLLBAR */
