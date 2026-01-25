@@ -17,8 +17,7 @@ let timerInterval = null;
 let totalSeconds = 1500;
 let remainingSeconds = totalSeconds;
 
-/* Timer ring */
-
+/* Timer ring setup */
 const ring = document.querySelector(".timer-ring-progress");
 const radius = 100;
 const circumference = 2 * Math.PI * radius;
@@ -83,21 +82,18 @@ function finishOnboarding() {
 }
 
 /* Initial onboarding state */
-
 if (!userName || !userAge || !userPurpose.length) {
   onboardingScreen.style.display = "flex";
   appRoot.style.display = "none";
   goToOnboardingStep(1);
 } else {
-  onboardingScreen.style.display = "flex";
-  appRoot.style.display = "flex";
   onboardingScreen.style.display = "none";
+  appRoot.style.display = "flex";
   const greet = document.getElementById("home-greeting");
   if (greet) greet.textContent = `hello, ${userName}`;
 }
 
 /* Step 1: name */
-
 document.getElementById("onboarding-next-1")?.addEventListener("click", () => {
   const nameInput = document.getElementById("onboarding-name-input");
   const name = (nameInput?.value || "").trim();
@@ -109,7 +105,6 @@ document.getElementById("onboarding-next-1")?.addEventListener("click", () => {
 });
 
 /* Step 2: age */
-
 document.getElementById("onboarding-next-2")?.addEventListener("click", () => {
   const ageInput = document.getElementById("onboarding-age-input");
   const ageValue = (ageInput?.value || "").trim();
@@ -121,7 +116,6 @@ document.getElementById("onboarding-next-2")?.addEventListener("click", () => {
 });
 
 /* Step 3: purpose */
-
 document.getElementById("onboarding-finish")?.addEventListener("click", () => {
   const checks = document.querySelectorAll('input[name="purpose"]:checked');
   const selected = Array.from(checks).map(c => c.value);
@@ -149,8 +143,8 @@ document.getElementById("settings-change-name")?.addEventListener("click", () =>
 
 document.getElementById("settings-theme-toggle")?.addEventListener("click", () => {
   const root = document.documentElement;
-  const current = root.getAttribute("data-theme") || "dark";
-  const next = current === "dark" ? "light" : "dark";
+  const current = root.getAttribute("data-theme") || "light";
+  const next = current === "light" ? "dark" : "light";
   root.setAttribute("data-theme", next);
   localStorage.setItem("aura-theme", next);
 });
@@ -174,7 +168,6 @@ navButtons.forEach(btn => {
     const target = btn.dataset.screenTarget;
 
     navButtons.forEach(b => b.classList.remove("is-active"));
-    btn.addClass = "is-active";
     btn.classList.add("is-active");
 
     showScreen(target);
@@ -239,7 +232,7 @@ function renderDecks() {
     const empty = document.createElement("p");
     empty.textContent = "no decks yet. create one to get started.";
     empty.style.fontSize = "13px";
-    empty.style.color = "#c7c7d9";
+    empty.style.color = "#666";
     deckGrid.appendChild(empty);
     return;
   }
@@ -459,8 +452,7 @@ document.getElementById("delete-note-button")?.addEventListener("click", () => {
   noteEditorOverlay.classList.remove("is-visible");
 });
 
-/* Simple toolbar */
-
+/* Toolbar */
 document.querySelectorAll(".toolbar-button").forEach(btn => {
   btn.addEventListener("click", () => {
     const cmd = btn.dataset.command;
@@ -540,6 +532,5 @@ document.getElementById("pomodoro-reset")?.addEventListener("click", () => {
 });
 
 /* Initial timer display */
-
 updateTimerDisplay();
 updateRing();
