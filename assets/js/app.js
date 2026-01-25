@@ -1,20 +1,8 @@
 /* =========================
-   SUPABASE CLIENT (disabled for now)
+   SUPABASE (disabled)
 ========================= */
 
-// Supabase is kept for future cloud sync, but fully disabled so no errors occur.
 let supabaseClient = null;
-// Do NOT initialize Supabase until you add a real URL + key.
-if (false) {
-  try {
-    supabaseClient = window.supabase.createClient(
-      "YOUR_SUPABASE_URL",
-      "YOUR_SUPABASE_ANON_KEY"
-    );
-  } catch (e) {
-    console.warn("Supabase not initialised (and that's okay for now).");
-  }
-}
 
 /* =========================
    STATE
@@ -57,10 +45,8 @@ if (ring) {
 
 const onboardingScreen = document.getElementById("onboarding-screen");
 const onboardingStepsContainer = document.querySelector(".onboarding-steps");
-const onboardingCards = document.querySelectorAll(".onboarding-card");
 
 const appRoot = document.getElementById("app-root");
-
 const screens = document.querySelectorAll(".aura-screen");
 const navButtons = document.querySelectorAll(".bottom-nav-item");
 
@@ -72,13 +58,8 @@ const flashcardBack = document.getElementById("flashcard-back");
 const flashcardProgress = document.getElementById("flashcard-progress");
 
 const flashcardModal = document.getElementById("flashcard-modal");
-const flashcardModalTitle = document.getElementById("flashcard-modal-title");
 const flashcardFrontInput = document.getElementById("flashcard-front-input");
 const flashcardBackInput = document.getElementById("flashcard-back-input");
-const flashcardModalSave = document.getElementById("flashcard-modal-save");
-const flashcardModalCancel = document.getElementById("flashcard-modal-cancel");
-
-let flashcardModalMode = "add";
 
 const notesList = document.getElementById("notes-list");
 const notesSearchInput = document.getElementById("notes-search-input");
@@ -105,7 +86,7 @@ function haptic(ms = 20) {
 }
 
 /* =========================
-   ONBOARDING (every time)
+   ONBOARDING
 ========================= */
 
 let onboardingStep = 1;
@@ -128,72 +109,40 @@ function finishOnboarding() {
   renderPomodoroStats();
 }
 
-/* Step 1 */
 document.getElementById("onboarding-next-1").addEventListener("click", () => {
-  const nameInput = document.getElementById("onboarding-name-input");
-  const name = nameInput.value.trim();
+  const name = document.getElementById("onboarding-name-input").value.trim();
   if (!name) return;
-
   userName = name;
   goToOnboardingStep(2);
 });
 
-/* Step 2 */
 document.getElementById("onboarding-next-2").addEventListener("click", () => {
-  const ageInput = document.getElementById("onboarding-age-input");
-  const ageValue = ageInput.value.trim();
-  if (!ageValue) return;
-
-  userAge = ageValue;
+  const age = document.getElementById("onboarding-age-input").value.trim();
+  if (!age) return;
+  userAge = age;
   goToOnboardingStep(3);
 });
 
-/* Step 3 */
 document.getElementById("onboarding-finish").addEventListener("click", () => {
   const checks = document.querySelectorAll('input[name="purpose"]:checked');
-  const selected = Array.from(checks).map(c => c.value);
-  if (!selected.length) return;
-
-  userPurpose = selected;
+  userPurpose = Array.from(checks).map(c => c.value);
+  if (!userPurpose.length) return;
   finishOnboarding();
 });
 
-/* Skip button (mode B: save whatever is typed) */
-document.getElementById("onboarding-skip")?.addEventListener("click", () => {
+document.getElementById("onboarding-skip").addEventListener("click", () => {
   finishOnboarding();
 });
 
-/* Back buttons */
 document.querySelectorAll(".onboarding-back-button").forEach(btn => {
   btn.addEventListener("click", () => {
     goToOnboardingStep(parseInt(btn.dataset.backStep, 10));
   });
 });
 
-/* Initial onboarding state */
 onboardingScreen.style.display = "flex";
 appRoot.style.display = "none";
 goToOnboardingStep(1);
-
-/* =========================
-   SETTINGS
-========================= */
-
-document.getElementById("settings-change-name").addEventListener("click", () => {
-  const newName = prompt("enter your new name:", userName || "");
-  if (!newName) return;
-
-  userName = newName.trim();
-
-  const greet = document.getElementById("home-greeting");
-  if (greet) greet.textContent = `hello, ${userName}`;
-});
-
-document.getElementById("settings-theme-toggle").addEventListener("click", () => {
-  const root = document.documentElement;
-  const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-  root.setAttribute("data-theme", next);
-});
 
 /* =========================
    NAVIGATION
@@ -246,7 +195,6 @@ document.getElementById("todo-add-button").addEventListener("click", () => {
   todos.push(text.trim());
   saveTodos();
   renderTodos();
-  haptic(20);
 });
 
 /* =========================
@@ -305,13 +253,9 @@ function renderFlashcard() {
   flashcardProgress.textContent = `${currentCardIndex + 1} / ${deck.length}`;
 }
 
-/* =========================
-   FLASHCARD CONTROLS
-========================= */
-
+/* Controls */
 document.getElementById("flashcard-flip").addEventListener("click", () => {
   flashcard.classList.toggle("is-flipped");
-  haptic(20);
 });
 
 document.getElementById("flashcard-next").addEventListener("click", () => {
@@ -319,7 +263,6 @@ document.getElementById("flashcard-next").addEventListener("click", () => {
   currentCardIndex = (currentCardIndex + 1) % deck.length;
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
-  haptic(15);
 });
 
 document.getElementById("flashcard-prev").addEventListener("click", () => {
@@ -327,72 +270,39 @@ document.getElementById("flashcard-prev").addEventListener("click", () => {
   currentCardIndex = (currentCardIndex - 1 + deck.length) % deck.length;
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
-  haptic(15);
 });
 
-/* =========================
-   FLASHCARD MODAL
-========================= */
-
-function openFlashcardModal(mode) {
-  flashcardModalMode = mode;
+/* Modal */
+document.getElementById("open-add-card").addEventListener("click", () => {
   flashcardModal.classList.add("is-visible");
-}
+});
 
-function closeFlashcardModal() {
+document.getElementById("flashcard-modal-cancel").addEventListener("click", () => {
   flashcardModal.classList.remove("is-visible");
   flashcardFrontInput.value = "";
   flashcardBackInput.value = "";
-}
+});
 
-flashcardModalCancel.addEventListener("click", closeFlashcardModal);
-
-flashcardModalSave.addEventListener("click", () => {
+document.getElementById("flashcard-modal-save").addEventListener("click", () => {
   const front = flashcardFrontInput.value.trim();
   const back = flashcardBackInput.value.trim();
   if (!front || !back) return;
 
-  const deck = decks[currentDeck];
-
-  if (flashcardModalMode === "add") {
-    deck.push({ front, back });
-    currentCardIndex = deck.length - 1;
-  } else {
-    deck[currentCardIndex] = { front, back };
-  }
-
+  decks[currentDeck].push({ front, back });
   saveDecks();
+  flashcardModal.classList.remove("is-visible");
+  flashcardFrontInput.value = "";
+  flashcardBackInput.value = "";
   renderFlashcard();
-  closeFlashcardModal();
-  haptic(25);
 });
 
 document.getElementById("delete-card-button").addEventListener("click", () => {
   const deck = decks[currentDeck];
-  if (!deck || !deck.length) return;
-
+  if (!deck.length) return;
   deck.splice(currentCardIndex, 1);
   currentCardIndex = 0;
   saveDecks();
   renderFlashcard();
-});
-
-/* =========================
-   ADD DECK BUTTON
-========================= */
-
-document.getElementById("add-deck-button").addEventListener("click", () => {
-  const name = prompt("deck name:");
-  if (!name) return;
-
-  if (decks[name]) {
-    alert("deck already exists.");
-    return;
-  }
-
-  decks[name] = [];
-  saveDecks();
-  renderDecks();
 });
 
 /* =========================
@@ -447,10 +357,7 @@ notesSearchInput.addEventListener("input", e => {
   renderNotes();
 });
 
-/* =========================
-   NOTE EDITOR
-========================= */
-
+/* Editor */
 function openNoteEditor(index = null) {
   noteEditorOverlay.classList.add("is-visible");
   appRoot.style.display = "none";
@@ -477,24 +384,9 @@ document.getElementById("add-note-button").addEventListener("click", () => {
   openNoteEditor(null);
 });
 
-document.getElementById("quick-note-button").addEventListener("click", () => {
-  openNoteEditor(null);
-});
-
-document.getElementById("close-note-editor").addEventListener("click", closeNoteEditor);
-
-function closeNoteEditor() {
+document.getElementById("close-note-editor").addEventListener("click", () => {
   noteEditorOverlay.classList.remove("is-visible");
   appRoot.style.display = "flex";
-}
-
-/* Swipe down to close */
-let noteStartY = 0;
-noteEditorOverlay.addEventListener("touchstart", e => {
-  noteStartY = e.touches[0].clientY;
-});
-noteEditorOverlay.addEventListener("touchend", e => {
-  if (e.changedTouches[0].clientY - noteStartY > 80) closeNoteEditor();
 });
 
 document.getElementById("save-note-button").addEventListener("click", () => {
@@ -516,8 +408,8 @@ document.getElementById("save-note-button").addEventListener("click", () => {
 
   saveNotes();
   renderNotes();
-  closeNoteEditor();
-  haptic(25);
+  noteEditorOverlay.classList.remove("is-visible");
+  appRoot.style.display = "flex";
 });
 
 document.getElementById("delete-note-button").addEventListener("click", () => {
@@ -526,30 +418,14 @@ document.getElementById("delete-note-button").addEventListener("click", () => {
 
   saveNotes();
   renderNotes();
-  closeNoteEditor();
-  haptic(40);
+  noteEditorOverlay.classList.remove("is-visible");
+  appRoot.style.display = "flex";
 });
 
 pinNoteButton.addEventListener("click", () => {
   const next = pinNoteButton.dataset.pinned !== "true";
   pinNoteButton.dataset.pinned = next ? "true" : "false";
   pinNoteButton.textContent = next ? "unpin" : "pin";
-});
-
-/* Toolbar */
-document.querySelectorAll(".toolbar-button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const cmd = btn.dataset.command;
-    const value = btn.dataset.value || null;
-
-    if (btn.dataset.checklist === "true") {
-      document.execCommand("insertUnorderedList");
-    } else {
-      document.execCommand(cmd, false, value);
-    }
-
-    noteEditorContent.focus();
-  });
 });
 
 /* =========================
@@ -614,7 +490,6 @@ document.getElementById("pomodoro-toggle").addEventListener("click", () => {
       pomodoroStats.seconds += totalSeconds;
       savePomodoroStats();
       renderPomodoroStats();
-      haptic(60);
 
       return;
     }
