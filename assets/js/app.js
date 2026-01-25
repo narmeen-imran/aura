@@ -1,13 +1,20 @@
-/* =========================
-   SUPABASE (disabled)
-========================= */
+/* =========================================================
+   AURA — FULLY MATCHED TO YOUR HTML
+   SECTION 1 — CORE SETUP + SAFE HELPERS + ONBOARDING
+   ========================================================= */
 
-let supabaseClient = null;
+/* -------------------------
+   SAFE EVENT LISTENER
+   Prevents crashes if an ID is missing
+------------------------- */
+function on(id, event, handler) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener(event, handler);
+}
 
-/* =========================
+/* -------------------------
    STATE
-========================= */
-
+------------------------- */
 let userName = "";
 let userAge = "";
 let userPurpose = [];
@@ -29,71 +36,57 @@ let pomodoroStats = JSON.parse(
 
 let noteSearchQuery = "";
 
-/* Timer ring */
-const ring = document.querySelector(".timer-ring-progress");
-const radius = 70;
-const circumference = 2 * Math.PI * radius;
-
-if (ring) {
-  ring.style.strokeDasharray = circumference;
-  ring.style.strokeDashoffset = 0;
-}
-
-/* =========================
+/* -------------------------
    ELEMENTS
-========================= */
-
+------------------------- */
 const onboardingScreen = document.getElementById("onboarding-screen");
 const onboardingStepsContainer = document.querySelector(".onboarding-steps");
-
 const appRoot = document.getElementById("app-root");
 const screens = document.querySelectorAll(".aura-screen");
 const navButtons = document.querySelectorAll(".bottom-nav-item");
 
+/* Flashcards */
 const deckGrid = document.getElementById("deck-grid");
-
 const flashcard = document.getElementById("flashcard");
 const flashcardFront = document.getElementById("flashcard-front");
 const flashcardBack = document.getElementById("flashcard-back");
 const flashcardProgress = document.getElementById("flashcard-progress");
-
 const flashcardModal = document.getElementById("flashcard-modal");
 const flashcardFrontInput = document.getElementById("flashcard-front-input");
 const flashcardBackInput = document.getElementById("flashcard-back-input");
 
+/* Notes */
 const notesList = document.getElementById("notes-list");
 const notesSearchInput = document.getElementById("notes-search-input");
-
 const noteEditorOverlay = document.getElementById("note-editor-overlay");
 const noteEditorContent = document.getElementById("note-editor-content");
 const noteEditorTitle = document.getElementById("note-editor-title-input");
 const noteTagsInput = document.getElementById("note-tags-input");
 const pinNoteButton = document.getElementById("pin-note-button");
 
+/* Timer */
 const timerDisplay = document.getElementById("pomodoro-time");
 const hourInput = document.getElementById("timer-hours");
 const minuteInput = document.getElementById("timer-minutes");
-
 const pomodoroStatsSessions = document.getElementById("pomodoro-stats-sessions");
 const pomodoroStatsTime = document.getElementById("pomodoro-stats-time");
 
-/* =========================
+/* -------------------------
    HAPTICS
-========================= */
-
+------------------------- */
 function haptic(ms = 20) {
   if (navigator.vibrate) navigator.vibrate(ms);
 }
 
-/* =========================
+/* -------------------------
    ONBOARDING
-========================= */
-
+------------------------- */
 let onboardingStep = 1;
 
 function goToOnboardingStep(step) {
   onboardingStep = step;
-  onboardingStepsContainer.style.transform = `translateX(${(step - 1) * -100}vw)`;
+  onboardingStepsContainer.style.transform =
+    `translateX(${(step - 1) * -100}vw)`;
 }
 
 function finishOnboarding() {
@@ -109,61 +102,82 @@ function finishOnboarding() {
   renderPomodoroStats();
 }
 
-document.getElementById("onboarding-next-1").addEventListener("click", () => {
+/* Step 1 → Step 2 */
+on("onboarding-next-1", "click", () => {
   const name = document.getElementById("onboarding-name-input").value.trim();
   if (!name) return;
   userName = name;
   goToOnboardingStep(2);
 });
 
-document.getElementById("onboarding-next-2").addEventListener("click", () => {
+/* Step 2 → Step 3 */
+on("onboarding-next-2", "click", () => {
   const age = document.getElementById("onboarding-age-input").value.trim();
   if (!age) return;
   userAge = age;
   goToOnboardingStep(3);
 });
 
-document.getElementById("onboarding-finish").addEventListener("click", () => {
+/* Finish onboarding */
+on("onboarding-finish", "click", () => {
   const checks = document.querySelectorAll('input[name="purpose"]:checked');
   userPurpose = Array.from(checks).map(c => c.value);
   if (!userPurpose.length) return;
   finishOnboarding();
 });
+/* =========================================================
+   SECTION 2 — NAVIGATION + TODOS
+   ========================================================= */
 
-/* =========================
-   NAVIGATION
-========================= */
+/* -------------------------
+   NAVIGATION BETWEEN SCREENS
+------------------------- */
 
+/**
+ * Shows a screen by its data-screen="name"
+ */
 function showScreen(name) {
   screens.forEach(s => s.classList.remove("is-active"));
-  document.querySelector(`[data-screen="${name}"]`).classList.add("is-active");
+  const target = document.querySelector(`[data-screen="${name}"]`);
+  if (target) target.classList.add("is-active");
 }
 
+/* Bottom navigation buttons */
 navButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     navButtons.forEach(b => b.classList.remove("is-active"));
     btn.classList.add("is-active");
-    showScreen(btn.dataset.screenTarget);
+    showScreen(btn.dataset.screenTarget.trim());
   });
 });
 
-/* =========================
+/* -------------------------
    TODO LIST
-========================= */
+------------------------- */
 
 function saveTodos() {
   localStorage.setItem("aura-todos", JSON.stringify(todos));
 }
 
+/**
+ * Renders the todo list on the home screen
+ */
 function renderTodos() {
   const list = document.getElementById("todo-list");
+  if (!list) return;
+
   list.innerHTML = "";
 
   todos.forEach((item, index) => {
     const li = document.createElement("li");
     li.className = "todo-item";
-    li.innerHTML = `<span>${item}</span><button class="ghost-button small">x</button>`;
 
+    li.innerHTML = `
+      <span>${item}</span>
+      <button class="ghost-button small">x</button>
+    `;
+
+    /* Delete todo */
     li.querySelector("button").addEventListener("click", () => {
       todos.splice(index, 1);
       saveTodos();
@@ -175,28 +189,40 @@ function renderTodos() {
   });
 }
 
-document.getElementById("todo-add-button").addEventListener("click", () => {
+/* Add new todo */
+on("todo-add-button", "click", () => {
   const text = prompt("new task:");
   if (!text) return;
+
   todos.push(text.trim());
   saveTodos();
   renderTodos();
 });
+/* =========================================================
+   SECTION 3 — DECKS + FLASHCARDS + MODAL LOGIC
+   ========================================================= */
 
-/* =========================
-   FLASHCARDS
-========================= */
+/* -------------------------
+   SAVE / RENDER DECKS
+------------------------- */
 
 function saveDecks() {
   localStorage.setItem("aura-decks", JSON.stringify(decks));
 }
 
+/**
+ * Renders the list of decks on the "decks" screen
+ */
 function renderDecks() {
   deckGrid.innerHTML = "";
 
   const names = Object.keys(decks);
+
   if (!names.length) {
-    deckGrid.innerHTML = `<p style="font-size:13px;color:#666;">no decks yet. create one to get started.</p>`;
+    deckGrid.innerHTML = `
+      <p style="font-size:13px;color:#666;">
+        no decks yet. create one to get started.
+      </p>`;
     return;
   }
 
@@ -204,28 +230,61 @@ function renderDecks() {
     const card = document.createElement("div");
     card.className = "deck-card";
     card.textContent = deckName;
+
     card.addEventListener("click", () => openDeck(deckName));
     deckGrid.appendChild(card);
   });
 }
+
+/* -------------------------
+   ADD NEW DECK
+------------------------- */
+
+on("add-deck-button", "click", () => {
+  const name = prompt("deck name:");
+  if (!name) return;
+
+  const trimmed = name.trim();
+  if (!trimmed) return;
+
+  if (decks[trimmed]) {
+    alert("a deck with that name already exists.");
+    return;
+  }
+
+  decks[trimmed] = [];
+  saveDecks();
+  renderDecks();
+});
+
+/* -------------------------
+   OPEN DECK VIEWER
+------------------------- */
 
 function openDeck(name) {
   currentDeck = name;
   currentCardIndex = 0;
 
   document.getElementById("deck-viewer-title").textContent = name;
+
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
 
   showScreen("flashcard-viewer");
 }
 
-document.getElementById("back-to-decks").addEventListener("click", () => {
+/* Back to deck list */
+on("back-to-decks", "click", () => {
   showScreen("flashcards");
 });
 
+/* -------------------------
+   FLASHCARD RENDERING
+------------------------- */
+
 function renderFlashcard() {
   const deck = decks[currentDeck];
+
   if (!deck || !deck.length) {
     flashcardFront.textContent = "no cards yet";
     flashcardBack.textContent = "";
@@ -234,71 +293,172 @@ function renderFlashcard() {
   }
 
   const card = deck[currentCardIndex];
+
   flashcardFront.textContent = card.front;
   flashcardBack.textContent = card.back;
-  flashcardProgress.textContent = `${currentCardIndex + 1} / ${deck.length}`;
+  flashcardProgress.textContent =
+    `${currentCardIndex + 1} / ${deck.length}`;
 }
 
-/* Controls */
-document.getElementById("flashcard-flip").addEventListener("click", () => {
+/* Flip card */
+on("flashcard-flip", "click", () => {
   flashcard.classList.toggle("is-flipped");
 });
 
-document.getElementById("flashcard-next").addEventListener("click", () => {
+/* Next card */
+on("flashcard-next", "click", () => {
   const deck = decks[currentDeck];
+  if (!deck.length) return;
+
   currentCardIndex = (currentCardIndex + 1) % deck.length;
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
 });
 
-document.getElementById("flashcard-prev").addEventListener("click", () => {
+/* Previous card */
+on("flashcard-prev", "click", () => {
   const deck = decks[currentDeck];
-  currentCardIndex = (currentCardIndex - 1 + deck.length) % deck.length;
+  if (!deck.length) return;
+
+  currentCardIndex =
+    (currentCardIndex - 1 + deck.length) % deck.length;
+
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
 });
 
-/* Modal */
-document.getElementById("open-add-card").addEventListener("click", () => {
+/* -------------------------
+   ADD CARD (EMPTY MODAL)
+------------------------- */
+
+on("add-card-button", "click", () => {
+  document.getElementById("flashcard-modal-title").textContent = "add card";
+
+  flashcardFrontInput.value = "";
+  flashcardBackInput.value = "";
+
+  flashcardModal.dataset.mode = "add";
   flashcardModal.classList.add("is-visible");
 });
 
-document.getElementById("flashcard-modal-cancel").addEventListener("click", () => {
-  flashcardModal.classList.remove("is-visible");
-  flashcardFrontInput.value = "";
-  flashcardBackInput.value = "";
-});
+/* -------------------------
+   EDIT CARD (EMPTY MODAL, OVERWRITE)
+------------------------- */
 
-document.getElementById("flashcard-modal-save").addEventListener("click", () => {
-  const front = flashcardFrontInput.value.trim();
-  const back = flashcardBackInput.value.trim();
-  if (!front || !back) return;
-
-  decks[currentDeck].push({ front, back });
-  saveDecks();
-  flashcardModal.classList.remove("is-visible");
-  flashcardFrontInput.value = "";
-  flashcardBackInput.value = "";
-  renderFlashcard();
-});
-
-document.getElementById("delete-card-button").addEventListener("click", () => {
+on("edit-card-button", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
+
+  document.getElementById("flashcard-modal-title").textContent = "edit card";
+
+  flashcardFrontInput.value = "";
+  flashcardBackInput.value = "";
+
+  flashcardModal.dataset.mode = "edit";
+  flashcardModal.classList.add("is-visible");
+});
+
+/* -------------------------
+   SAVE CARD (ADD OR EDIT)
+------------------------- */
+
+on("flashcard-modal-save", "click", () => {
+  const front = flashcardFrontInput.value.trim();
+  const back = flashcardBackInput.value.trim();
+
+  if (!front || !back) return;
+
+  const deck = decks[currentDeck];
+
+  if (flashcardModal.dataset.mode === "add") {
+    deck.push({ front, back });
+  } else {
+    deck[currentCardIndex] = { front, back };
+  }
+
+  saveDecks();
+  flashcardModal.classList.remove("is-visible");
+
+  flashcardFrontInput.value = "";
+  flashcardBackInput.value = "";
+
+  renderFlashcard();
+});
+
+/* Cancel modal */
+on("flashcard-modal-cancel", "click", () => {
+  flashcardModal.classList.remove("is-visible");
+});
+
+/* -------------------------
+   DELETE CARD
+------------------------- */
+
+on("delete-card-button", "click", () => {
+  const deck = decks[currentDeck];
+  if (!deck.length) return;
+
   deck.splice(currentCardIndex, 1);
   currentCardIndex = 0;
+
   saveDecks();
   renderFlashcard();
 });
 
-/* =========================
-   NOTES
-========================= */
+/* -------------------------
+   RENAME DECK (CHANGES KEY)
+------------------------- */
 
+on("rename-deck-button", "click", () => {
+  const newName = prompt("new deck name:");
+  if (!newName) return;
+
+  const trimmed = newName.trim();
+  if (!trimmed) return;
+
+  if (decks[trimmed]) {
+    alert("a deck with that name already exists.");
+    return;
+  }
+
+  decks[trimmed] = decks[currentDeck];
+  delete decks[currentDeck];
+
+  currentDeck = trimmed;
+
+  saveDecks();
+  renderDecks();
+
+  document.getElementById("deck-viewer-title").textContent = trimmed;
+});
+
+/* -------------------------
+   DELETE DECK (CONFIRMATION)
+------------------------- */
+
+on("delete-deck-button", "click", () => {
+  if (!confirm("delete this deck?")) return;
+
+  delete decks[currentDeck];
+  saveDecks();
+  renderDecks();
+
+  showScreen("flashcards");
+});
+/* =========================================================
+   SECTION 4 — NOTES + EDITOR + SEARCH + PINNING
+   ========================================================= */
+
+/* -------------------------
+   SAVE NOTES
+------------------------- */
 function saveNotes() {
   localStorage.setItem("aura-notes", JSON.stringify(notes));
 }
 
+/* -------------------------
+   RENDER NOTES LIST
+------------------------- */
 function renderNotes() {
   notesList.innerHTML = "";
 
@@ -338,12 +498,17 @@ function renderNotes() {
   });
 }
 
+/* -------------------------
+   SEARCH NOTES
+------------------------- */
 notesSearchInput.addEventListener("input", e => {
   noteSearchQuery = e.target.value;
   renderNotes();
 });
 
-/* Editor */
+/* -------------------------
+   OPEN NOTE EDITOR
+------------------------- */
 function openNoteEditor(index = null) {
   noteEditorOverlay.classList.add("is-visible");
   appRoot.style.display = "none";
@@ -366,16 +531,21 @@ function openNoteEditor(index = null) {
   }
 }
 
-document.getElementById("add-note-button").addEventListener("click", () => {
+/* Add new note */
+on("add-note-button", "click", () => {
   openNoteEditor(null);
 });
 
-document.getElementById("close-note-editor").addEventListener("click", () => {
+/* Close editor */
+on("close-note-editor", "click", () => {
   noteEditorOverlay.classList.remove("is-visible");
   appRoot.style.display = "flex";
 });
 
-document.getElementById("save-note-button").addEventListener("click", () => {
+/* -------------------------
+   SAVE NOTE
+------------------------- */
+on("save-note-button", "click", () => {
   const title = noteEditorTitle.value.trim();
   const content = noteEditorContent.innerHTML.trim();
   const tags = noteTagsInput.value.trim();
@@ -394,48 +564,101 @@ document.getElementById("save-note-button").addEventListener("click", () => {
 
   saveNotes();
   renderNotes();
+
   noteEditorOverlay.classList.remove("is-visible");
   appRoot.style.display = "flex";
 });
 
-document.getElementById("delete-note-button").addEventListener("click", () => {
+/* -------------------------
+   DELETE NOTE
+------------------------- */
+on("delete-note-button", "click", () => {
   const editing = noteEditorOverlay.dataset.editing;
   if (editing !== "new") notes.splice(editing, 1);
 
   saveNotes();
   renderNotes();
+
   noteEditorOverlay.classList.remove("is-visible");
   appRoot.style.display = "flex";
 });
 
+/* -------------------------
+   PIN / UNPIN NOTE
+------------------------- */
 pinNoteButton.addEventListener("click", () => {
   const next = pinNoteButton.dataset.pinned !== "true";
   pinNoteButton.dataset.pinned = next ? "true" : "false";
   pinNoteButton.textContent = next ? "unpin" : "pin";
 });
 
-/* =========================
-   POMODORO
-========================= */
+/* -------------------------
+   NOTE TOOLBAR (BOLD, ITALIC, H1, ETC.)
+------------------------- */
+document.querySelectorAll(".toolbar-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const command = btn.dataset.command;
+    const value = btn.dataset.value || null;
 
+    if (btn.dataset.checklist === "true") {
+      document.execCommand("insertUnorderedList");
+      return;
+    }
+
+    document.execCommand(command, false, value);
+  });
+});
+/* =========================================================
+   SECTION 5 — TIMER + STATS
+   ========================================================= */
+
+/* -------------------------
+   GET CUSTOM TIME
+------------------------- */
+/**
+ * Reads hours + minutes inputs and converts to seconds.
+ * If user enters 0, defaults to 25 minutes (1500 seconds).
+ */
 function getCustomTime() {
   const h = parseInt(hourInput.value || "0", 10);
   const m = parseInt(minuteInput.value || "0", 10);
+
   const seconds = h * 3600 + m * 60;
   return seconds > 0 ? seconds : 1500;
 }
 
+/* -------------------------
+   UPDATE TIMER DISPLAY
+------------------------- */
 function updateTimerDisplay() {
   const m = Math.floor(remainingSeconds / 60);
   const s = remainingSeconds % 60;
-  timerDisplay.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+  timerDisplay.textContent =
+    `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/* -------------------------
+   TIMER RING ANIMATION
+------------------------- */
+const ring = document.querySelector(".timer-ring-progress");
+const radius = 70;
+const circumference = 2 * Math.PI * radius;
+
+if (ring) {
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = 0;
 }
 
 function updateRing() {
   if (!ring) return;
-  ring.style.strokeDashoffset = circumference * (1 - remainingSeconds / totalSeconds);
+  ring.style.strokeDashoffset =
+    circumference * (1 - remainingSeconds / totalSeconds);
 }
 
+/* -------------------------
+   SAVE + RENDER STATS
+------------------------- */
 function savePomodoroStats() {
   localStorage.setItem("aura-pomodoro-stats", JSON.stringify(pomodoroStats));
 }
@@ -446,9 +669,13 @@ function renderPomodoroStats() {
   pomodoroStatsTime.textContent = `focused time: ${minutes} min`;
 }
 
-document.getElementById("pomodoro-toggle").addEventListener("click", () => {
+/* -------------------------
+   START / PAUSE TIMER
+------------------------- */
+on("pomodoro-toggle", "click", () => {
   const btn = document.getElementById("pomodoro-toggle");
 
+  /* Pause timer */
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
@@ -456,22 +683,27 @@ document.getElementById("pomodoro-toggle").addEventListener("click", () => {
     return;
   }
 
+  /* Start timer */
   totalSeconds = getCustomTime();
   remainingSeconds = totalSeconds;
+
   updateTimerDisplay();
   updateRing();
 
   timerInterval = setInterval(() => {
     remainingSeconds--;
 
+    /* Timer finished */
     if (remainingSeconds <= 0) {
       remainingSeconds = 0;
       updateTimerDisplay();
       updateRing();
+
       clearInterval(timerInterval);
       timerInterval = null;
       btn.textContent = "start";
 
+      /* Update stats */
       pomodoroStats.sessions += 1;
       pomodoroStats.seconds += totalSeconds;
       savePomodoroStats();
@@ -487,7 +719,10 @@ document.getElementById("pomodoro-toggle").addEventListener("click", () => {
   btn.textContent = "pause";
 });
 
-document.getElementById("pomodoro-reset").addEventListener("click", () => {
+/* -------------------------
+   RESET TIMER
+------------------------- */
+on("pomodoro-reset", "click", () => {
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
@@ -495,19 +730,83 @@ document.getElementById("pomodoro-reset").addEventListener("click", () => {
 
   totalSeconds = getCustomTime();
   remainingSeconds = totalSeconds;
+
   updateTimerDisplay();
   updateRing();
 
   document.getElementById("pomodoro-toggle").textContent = "start";
 });
+/* =========================================================
+   SECTION 6 — SETTINGS (CHANGE NAME + THEME TOGGLE)
+   ========================================================= */
 
-/* =========================
-   INITIAL RENDER
-========================= */
+/* -------------------------
+   CHANGE NAME
+------------------------- */
+on("settings-change-name", "click", () => {
+  const newName = prompt("what should i call you?");
+  if (!newName) return;
 
-updateTimerDisplay();
-updateRing();
-renderTodos();
-renderDecks();
-renderNotes();
-renderPomodoroStats();
+  userName = newName.trim();
+  const greet = document.getElementById("home-greeting");
+  if (greet) greet.textContent = `hello, ${userName}`;
+});
+
+/* -------------------------
+   THEME TOGGLE (LIGHT / DARK)
+------------------------- */
+on("settings-theme-toggle", "click", () => {
+  const html = document.documentElement;
+
+  if (html.dataset.theme === "dark") {
+    html.dataset.theme = "light";
+    localStorage.setItem("aura-theme", "light");
+  } else {
+    html.dataset.theme = "dark";
+    localStorage.setItem("aura-theme", "dark");
+  }
+});
+
+/* -------------------------
+   LOAD SAVED THEME
+------------------------- */
+(function loadTheme() {
+  const saved = localStorage.getItem("aura-theme");
+  if (saved) document.documentElement.dataset.theme = saved;
+})();
+/* =========================================================
+   SECTION 7 — INITIALIZATION + FIRST RENDER
+   ========================================================= */
+
+/* -------------------------
+   INITIAL LOAD
+------------------------- */
+
+/**
+ * Loads everything when the app starts.
+ * If onboarding hasn't been completed, show onboarding.
+ */
+function initApp() {
+  // If onboarding screen exists, show it first
+  if (onboardingScreen) {
+    onboardingScreen.style.display = "flex";
+    appRoot.style.display = "none";
+  }
+
+  // Load theme
+  const savedTheme = localStorage.getItem("aura-theme");
+  if (savedTheme) {
+    document.documentElement.dataset.theme = savedTheme;
+  }
+
+  // Render all UI components
+  renderTodos();
+  renderDecks();
+  renderNotes();
+  renderPomodoroStats();
+  updateTimerDisplay();
+  updateRing();
+}
+
+/* Run app */
+initApp();
