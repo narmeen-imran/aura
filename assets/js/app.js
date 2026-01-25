@@ -1,20 +1,28 @@
 /* =========================
-   SUPABASE CLIENT (unused for now)
+   SUPABASE CLIENT (disabled for now)
 ========================= */
 
-// replace with your real values later if you want cloud sync
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase is kept for future cloud sync, but fully disabled so no errors occur.
+let supabaseClient = null;
+// Do NOT initialize Supabase until you add a real URL + key.
+if (false) {
+  try {
+    supabaseClient = window.supabase.createClient(
+      "YOUR_SUPABASE_URL",
+      "YOUR_SUPABASE_ANON_KEY"
+    );
+  } catch (e) {
+    console.warn("Supabase not initialised (and that's okay for now).");
+  }
+}
 
 /* =========================
    STATE
 ========================= */
 
-let userName = localStorage.getItem("aura-name") || "";
-let userAge = localStorage.getItem("aura-age") || "";
-let userPurpose = JSON.parse(localStorage.getItem("aura-purpose") || "[]");
+let userName = "";
+let userAge = "";
+let userPurpose = [];
 
 let decks = JSON.parse(localStorage.getItem("aura-decks") || "{}");
 let notes = JSON.parse(localStorage.getItem("aura-notes") || "[]");
@@ -27,7 +35,9 @@ let timerInterval = null;
 let totalSeconds = 1500;
 let remainingSeconds = totalSeconds;
 
-let pomodoroStats = JSON.parse(localStorage.getItem("aura-pomodoro-stats") || '{"sessions":0,"seconds":0}');
+let pomodoroStats = JSON.parse(
+  localStorage.getItem("aura-pomodoro-stats") || '{"sessions":0,"seconds":0}'
+);
 
 let noteSearchQuery = "";
 
@@ -68,7 +78,7 @@ const flashcardBackInput = document.getElementById("flashcard-back-input");
 const flashcardModalSave = document.getElementById("flashcard-modal-save");
 const flashcardModalCancel = document.getElementById("flashcard-modal-cancel");
 
-let flashcardModalMode = "add"; // "add" or "edit"
+let flashcardModalMode = "add";
 
 const notesList = document.getElementById("notes-list");
 const notesSearchInput = document.getElementById("notes-search-input");
@@ -91,9 +101,7 @@ const pomodoroStatsTime = document.getElementById("pomodoro-stats-time");
 ========================= */
 
 function haptic(ms = 20) {
-  if (navigator.vibrate) {
-    navigator.vibrate(ms);
-  }
+  if (navigator.vibrate) navigator.vibrate(ms);
 }
 
 /* =========================
@@ -104,13 +112,7 @@ let onboardingStep = 1;
 
 function goToOnboardingStep(step) {
   onboardingStep = step;
-  const offset = (step - 1) * -100;
-  onboardingStepsContainer.style.transform = `translateX(${offset}vw)`;
-
-  onboardingCards.forEach(card => {
-    const s = parseInt(card.dataset.step, 10);
-    card.classList.toggle("is-active", s === step);
-  });
+  onboardingStepsContainer.style.transform = `translateX(${(step - 1) * -100}vw)`;
 }
 
 function finishOnboarding() {
@@ -127,44 +129,38 @@ function finishOnboarding() {
 }
 
 /* Step 1 */
-document.getElementById("onboarding-next-1")?.addEventListener("click", () => {
+document.getElementById("onboarding-next-1").addEventListener("click", () => {
   const nameInput = document.getElementById("onboarding-name-input");
-  const name = (nameInput?.value || "").trim();
+  const name = nameInput.value.trim();
   if (!name) return;
 
   userName = name;
-  localStorage.setItem("aura-name", userName);
   goToOnboardingStep(2);
 });
 
 /* Step 2 */
-document.getElementById("onboarding-next-2")?.addEventListener("click", () => {
+document.getElementById("onboarding-next-2").addEventListener("click", () => {
   const ageInput = document.getElementById("onboarding-age-input");
-  const ageValue = (ageInput?.value || "").trim();
+  const ageValue = ageInput.value.trim();
   if (!ageValue) return;
 
   userAge = ageValue;
-  localStorage.setItem("aura-age", userAge);
   goToOnboardingStep(3);
 });
-
 /* Step 3 */
-document.getElementById("onboarding-finish")?.addEventListener("click", () => {
+document.getElementById("onboarding-finish").addEventListener("click", () => {
   const checks = document.querySelectorAll('input[name="purpose"]:checked');
   const selected = Array.from(checks).map(c => c.value);
   if (!selected.length) return;
 
   userPurpose = selected;
-  localStorage.setItem("aura-purpose", JSON.stringify(userPurpose));
   finishOnboarding();
 });
 
 /* Back buttons */
 document.querySelectorAll(".onboarding-back-button").forEach(btn => {
   btn.addEventListener("click", () => {
-    const backStep = parseInt(btn.dataset.backStep, 10);
-    if (!backStep) return;
-    goToOnboardingStep(backStep);
+    goToOnboardingStep(parseInt(btn.dataset.backStep, 10));
   });
 });
 
@@ -177,29 +173,21 @@ goToOnboardingStep(1);
    SETTINGS
 ========================= */
 
-document.getElementById("settings-change-name")?.addEventListener("click", () => {
+document.getElementById("settings-change-name").addEventListener("click", () => {
   const newName = prompt("enter your new name:", userName || "");
   if (!newName) return;
 
   userName = newName.trim();
-  localStorage.setItem("aura-name", userName);
 
   const greet = document.getElementById("home-greeting");
   if (greet) greet.textContent = `hello, ${userName}`;
 });
 
-document.getElementById("settings-theme-toggle")?.addEventListener("click", () => {
+document.getElementById("settings-theme-toggle").addEventListener("click", () => {
   const root = document.documentElement;
-  const current = root.getAttribute("data-theme") || "light";
-  const next = current === "light" ? "dark" : "light";
+  const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
   root.setAttribute("data-theme", next);
-  localStorage.setItem("aura-theme", next);
 });
-
-const savedTheme = localStorage.getItem("aura-theme");
-if (savedTheme) {
-  document.documentElement.setAttribute("data-theme", savedTheme);
-}
 
 /* =========================
    NAVIGATION
@@ -207,22 +195,19 @@ if (savedTheme) {
 
 function showScreen(name) {
   screens.forEach(s => s.classList.remove("is-active"));
-  document.querySelector(`[data-screen="${name}"]`)?.classList.add("is-active");
+  document.querySelector(`[data-screen="${name}"]`).classList.add("is-active");
 }
 
 navButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    const target = btn.dataset.screenTarget;
-
     navButtons.forEach(b => b.classList.remove("is-active"));
     btn.classList.add("is-active");
-
-    showScreen(target);
+    showScreen(btn.dataset.screenTarget);
   });
 });
 
 /* =========================
-   TODO LIST (local)
+   TODO LIST
 ========================= */
 
 function saveTodos() {
@@ -231,17 +216,12 @@ function saveTodos() {
 
 function renderTodos() {
   const list = document.getElementById("todo-list");
-  if (!list) return;
-
   list.innerHTML = "";
+
   todos.forEach((item, index) => {
     const li = document.createElement("li");
     li.className = "todo-item";
-    li.dataset.index = index;
-    li.innerHTML = `
-      <span>${item}</span>
-      <button class="ghost-button small">x</button>
-    `;
+    li.innerHTML = `<span>${item}</span><button class="ghost-button small">x</button>`;
 
     li.querySelector("button").addEventListener("click", () => {
       todos.splice(index, 1);
@@ -250,13 +230,11 @@ function renderTodos() {
       haptic(30);
     });
 
-    addSwipeToDelete(li, index);
-
     list.appendChild(li);
   });
 }
 
-document.getElementById("todo-add-button")?.addEventListener("click", () => {
+document.getElementById("todo-add-button").addEventListener("click", () => {
   const text = prompt("new task:");
   if (!text) return;
   todos.push(text.trim());
@@ -265,43 +243,8 @@ document.getElementById("todo-add-button")?.addEventListener("click", () => {
   haptic(20);
 });
 
-/* Swipe to delete for todos */
-function addSwipeToDelete(element, index) {
-  let startX = 0;
-  let currentX = 0;
-  let swiping = false;
-
-  element.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-    swiping = true;
-  });
-
-  element.addEventListener("touchmove", e => {
-    if (!swiping) return;
-    currentX = e.touches[0].clientX;
-    const deltaX = currentX - startX;
-    if (deltaX < 0) {
-      element.style.transform = `translateX(${deltaX}px)`;
-    }
-  });
-
-  element.addEventListener("touchend", () => {
-    if (!swiping) return;
-    swiping = false;
-    const deltaX = currentX - startX;
-    if (deltaX < -80) {
-      todos.splice(index, 1);
-      saveTodos();
-      renderTodos();
-      haptic(40);
-    } else {
-      element.style.transform = "translateX(0)";
-    }
-  });
-}
-
 /* =========================
-   FLASHCARDS (local)
+   FLASHCARDS
 ========================= */
 
 function saveDecks() {
@@ -309,26 +252,19 @@ function saveDecks() {
 }
 
 function renderDecks() {
-  if (!deckGrid) return;
   deckGrid.innerHTML = "";
 
   const names = Object.keys(decks);
   if (!names.length) {
-    const empty = document.createElement("p");
-    empty.textContent = "no decks yet. create one to get started.";
-    empty.style.fontSize = "13px";
-    empty.style.color = "#666";
-    deckGrid.appendChild(empty);
+    deckGrid.innerHTML = `<p style="font-size:13px;color:#666;">no decks yet. create one to get started.</p>`;
     return;
   }
 
   names.forEach(deckName => {
     const card = document.createElement("div");
     card.className = "deck-card";
-    card.innerHTML = `<div>${deckName}</div>`;
-
+    card.textContent = deckName;
     card.addEventListener("click", () => openDeck(deckName));
-
     deckGrid.appendChild(card);
   });
 }
@@ -342,19 +278,15 @@ function openDeck(name) {
   renderFlashcard();
 
   showScreen("flashcard-viewer");
-  navButtons.forEach(b => b.classList.remove("is-active"));
-  document
-    .querySelector('.bottom-nav-item[data-screen-target="flashcards"]')
-    ?.classList.add("is-active");
 }
 
-document.getElementById("back-to-decks")?.addEventListener("click", () => {
+document.getElementById("back-to-decks").addEventListener("click", () => {
   showScreen("flashcards");
 });
 
 function renderFlashcard() {
   const deck = decks[currentDeck];
-  if (!deck || deck.length === 0) {
+  if (!deck || !deck.length) {
     flashcardFront.textContent = "no cards yet";
     flashcardBack.textContent = "";
     flashcardProgress.textContent = "";
@@ -367,87 +299,30 @@ function renderFlashcard() {
   flashcardProgress.textContent = `${currentCardIndex + 1} / ${deck.length}`;
 }
 
-document.getElementById("flashcard-flip")?.addEventListener("click", () => {
+document.getElementById("flashcard-flip").addEventListener("click", () => {
   flashcard.classList.toggle("is-flipped");
   haptic(20);
 });
 
-document.getElementById("flashcard-next")?.addEventListener("click", () => {
+document.getElementById("flashcard-next").addEventListener("click", () => {
   const deck = decks[currentDeck];
-  if (!deck || !deck.length) return;
   currentCardIndex = (currentCardIndex + 1) % deck.length;
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
   haptic(15);
 });
 
-document.getElementById("flashcard-prev")?.addEventListener("click", () => {
+document.getElementById("flashcard-prev").addEventListener("click", () => {
   const deck = decks[currentDeck];
-  if (!deck || !deck.length) return;
   currentCardIndex = (currentCardIndex - 1 + deck.length) % deck.length;
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
   haptic(15);
 });
+/* =========================
+   FLASHCARD MODAL
+========================= */
 
-/* Swipe gestures for flashcard */
-if (flashcard) {
-  let startX = 0;
-  let endX = 0;
-
-  flashcard.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-  });
-
-  flashcard.addEventListener("touchend", e => {
-    endX = e.changedTouches[0].clientX;
-    const deltaX = endX - startX;
-    if (deltaX > 60) {
-      document.getElementById("flashcard-prev").click();
-    } else if (deltaX < -60) {
-      document.getElementById("flashcard-next").click();
-    } else {
-      document.getElementById("flashcard-flip").click();
-    }
-  });
-}
-
-/* Deck CRUD */
-document.getElementById("add-deck-button")?.addEventListener("click", () => {
-  const name = prompt("deck name:");
-  if (!name) return;
-  if (decks[name]) return alert("deck already exists.");
-
-  decks[name] = [];
-  saveDecks();
-  renderDecks();
-});
-
-document.getElementById("rename-deck-button")?.addEventListener("click", () => {
-  if (!currentDeck) return;
-  const newName = prompt("rename deck:", currentDeck);
-  if (!newName || newName === currentDeck) return;
-
-  decks[newName] = decks[currentDeck];
-  delete decks[currentDeck];
-  currentDeck = newName;
-
-  saveDecks();
-  renderDecks();
-  document.getElementById("deck-viewer-title").textContent = newName;
-});
-
-document.getElementById("delete-deck-button")?.addEventListener("click", () => {
-  if (!currentDeck) return;
-  if (!confirm(`delete deck "${currentDeck}"?`)) return;
-
-  delete decks[currentDeck];
-  saveDecks();
-  renderDecks();
-  showScreen("flashcards");
-});
-
-/* Card modal */
 function openFlashcardModal(mode) {
   flashcardModalMode = mode;
   flashcardModal.classList.add("is-visible");
@@ -459,16 +334,14 @@ function closeFlashcardModal() {
   flashcardBackInput.value = "";
 }
 
-document.getElementById("add-card-button")?.addEventListener("click", () => {
-  if (!currentDeck) return;
+document.getElementById("add-card-button").addEventListener("click", () => {
   flashcardModalTitle.textContent = "add card";
   flashcardFrontInput.value = "";
   flashcardBackInput.value = "";
   openFlashcardModal("add");
 });
 
-document.getElementById("edit-card-button")?.addEventListener("click", () => {
-  if (!currentDeck) return;
+document.getElementById("edit-card-button").addEventListener("click", () => {
   const deck = decks[currentDeck];
   if (!deck || !deck.length) return;
 
@@ -479,24 +352,19 @@ document.getElementById("edit-card-button")?.addEventListener("click", () => {
   openFlashcardModal("edit");
 });
 
-flashcardModalCancel?.addEventListener("click", () => {
-  closeFlashcardModal();
-});
+flashcardModalCancel.addEventListener("click", closeFlashcardModal);
 
-flashcardModalSave?.addEventListener("click", () => {
+flashcardModalSave.addEventListener("click", () => {
   const front = flashcardFrontInput.value.trim();
   const back = flashcardBackInput.value.trim();
   if (!front || !back) return;
 
-  if (!currentDeck) return;
-  const deck = decks[currentDeck] || [];
+  const deck = decks[currentDeck];
 
   if (flashcardModalMode === "add") {
     deck.push({ front, back });
-    decks[currentDeck] = deck;
     currentCardIndex = deck.length - 1;
   } else {
-    if (!deck.length) return;
     deck[currentCardIndex] = { front, back };
   }
 
@@ -506,19 +374,18 @@ flashcardModalSave?.addEventListener("click", () => {
   haptic(25);
 });
 
-document.getElementById("delete-card-button")?.addEventListener("click", () => {
-  if (!currentDeck) return;
+document.getElementById("delete-card-button").addEventListener("click", () => {
   const deck = decks[currentDeck];
   if (!deck || !deck.length) return;
 
   deck.splice(currentCardIndex, 1);
-  if (currentCardIndex >= deck.length) currentCardIndex = 0;
+  currentCardIndex = 0;
   saveDecks();
   renderFlashcard();
 });
 
 /* =========================
-   NOTES (local)
+   NOTES
 ========================= */
 
 function saveNotes() {
@@ -526,55 +393,53 @@ function saveNotes() {
 }
 
 function renderNotes() {
-  if (!notesList) return;
   notesList.innerHTML = "";
 
   const filtered = notes
     .map((note, index) => ({ ...note, index }))
     .filter(n => {
-      if (!noteSearchQuery) return true;
       const q = noteSearchQuery.toLowerCase();
       return (
-        (n.title || "").toLowerCase().includes(q) ||
-        (n.content || "").toLowerCase().includes(q) ||
-        (n.tags || "").toLowerCase().includes(q)
+        !q ||
+        n.title.toLowerCase().includes(q) ||
+        n.content.toLowerCase().includes(q) ||
+        n.tags.toLowerCase().includes(q)
       );
     })
     .sort((a, b) => {
-      const ap = a.pinned ? 1 : 0;
-      const bp = b.pinned ? 1 : 0;
-      if (ap !== bp) return bp - ap;
-      return (b.updatedAt || 0) - (a.updatedAt || 0);
+      if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+      return b.updatedAt - a.updatedAt;
     });
 
   filtered.forEach(n => {
-    const note = n;
     const card = document.createElement("div");
     card.className = "glass-card";
 
-    const plain = (note.content || "").replace(/<[^>]*>/g, "");
-    const preview = plain.slice(0, 80);
+    const preview = n.content.replace(/<[^>]*>/g, "").slice(0, 80);
 
     card.innerHTML = `
       <div class="note-card-header">
-        <h3>${note.title || "untitled"}</h3>
-        ${note.pinned ? '<span class="note-pin">pinned</span>' : ""}
+        <h3>${n.title || "untitled"}</h3>
+        ${n.pinned ? '<span class="note-pin">pinned</span>' : ""}
       </div>
-      <p>${preview}${plain.length > 80 ? "..." : ""}</p>
-      ${note.tags ? `<p class="hint-text">${note.tags}</p>` : ""}
+      <p>${preview}${preview.length === 80 ? "..." : ""}</p>
+      ${n.tags ? `<p class="hint-text">${n.tags}</p>` : ""}
     `;
 
-    card.addEventListener("click", () => openNoteEditor(note.index));
+    card.addEventListener("click", () => openNoteEditor(n.index));
     notesList.appendChild(card);
   });
 }
 
-notesSearchInput?.addEventListener("input", e => {
-  noteSearchQuery = e.target.value || "";
+notesSearchInput.addEventListener("input", e => {
+  noteSearchQuery = e.target.value;
   renderNotes();
 });
 
-/* Full-screen editor */
+/* =========================
+   NOTE EDITOR
+========================= */
+
 function openNoteEditor(index = null) {
   noteEditorOverlay.classList.add("is-visible");
   appRoot.style.display = "none";
@@ -588,21 +453,20 @@ function openNoteEditor(index = null) {
     pinNoteButton.textContent = "pin";
   } else {
     const note = notes[index];
-    noteEditorTitle.value = note.title || "";
-    noteEditorContent.innerHTML = note.content || "";
-    noteTagsInput.value = note.tags || "";
+    noteEditorTitle.value = note.title;
+    noteEditorContent.innerHTML = note.content;
+    noteTagsInput.value = note.tags;
     noteEditorOverlay.dataset.editing = index;
-    const pinned = !!note.pinned;
-    pinNoteButton.dataset.pinned = pinned ? "true" : "false";
-    pinNoteButton.textContent = pinned ? "unpin" : "pin";
+    pinNoteButton.dataset.pinned = note.pinned ? "true" : "false";
+    pinNoteButton.textContent = note.pinned ? "unpin" : "pin";
   }
 }
 
-document.getElementById("add-note-button")?.addEventListener("click", () => {
+document.getElementById("add-note-button").addEventListener("click", () => {
   openNoteEditor(null);
 });
 
-document.getElementById("quick-note-button")?.addEventListener("click", () => {
+document.getElementById("quick-note-button").addEventListener("click", () => {
   openNoteEditor(null);
 });
 
@@ -611,33 +475,28 @@ function closeNoteEditor() {
   appRoot.style.display = "flex";
 }
 
-document.getElementById("close-note-editor")?.addEventListener("click", () => {
-  closeNoteEditor();
-});
+document.getElementById("close-note-editor").addEventListener("click", closeNoteEditor);
 
-/* Swipe down to close editor */
+/* Swipe down to close */
 let noteStartY = 0;
 noteEditorOverlay.addEventListener("touchstart", e => {
   noteStartY = e.touches[0].clientY;
 });
-
 noteEditorOverlay.addEventListener("touchend", e => {
-  const endY = e.changedTouches[0].clientY;
-  const deltaY = endY - noteStartY;
-  if (deltaY > 80) {
-    closeNoteEditor();
-  }
+  if (e.changedTouches[0].clientY - noteStartY > 80) closeNoteEditor();
 });
 
-document.getElementById("save-note-button")?.addEventListener("click", () => {
+document.getElementById("save-note-button").addEventListener("click", () => {
   const title = noteEditorTitle.value.trim();
   const content = noteEditorContent.innerHTML.trim();
   const tags = noteTagsInput.value.trim();
   const pinned = pinNoteButton.dataset.pinned === "true";
-  if (!content && !title) return;
+
+  if (!title && !content) return;
 
   const now = Date.now();
   const editing = noteEditorOverlay.dataset.editing;
+
   if (editing === "new") {
     notes.push({ title, content, tags, pinned, updatedAt: now });
   } else {
@@ -650,23 +509,18 @@ document.getElementById("save-note-button")?.addEventListener("click", () => {
   haptic(25);
 });
 
-document.getElementById("delete-note-button")?.addEventListener("click", () => {
+document.getElementById("delete-note-button").addEventListener("click", () => {
   const editing = noteEditorOverlay.dataset.editing;
-  if (editing === "new") {
-    closeNoteEditor();
-    return;
-  }
+  if (editing !== "new") notes.splice(editing, 1);
 
-  notes.splice(editing, 1);
   saveNotes();
   renderNotes();
   closeNoteEditor();
   haptic(40);
 });
 
-pinNoteButton?.addEventListener("click", () => {
-  const current = pinNoteButton.dataset.pinned === "true";
-  const next = !current;
+pinNoteButton.addEventListener("click", () => {
+  const next = pinNoteButton.dataset.pinned !== "true";
   pinNoteButton.dataset.pinned = next ? "true" : "false";
   pinNoteButton.textContent = next ? "unpin" : "pin";
 });
@@ -678,7 +532,7 @@ document.querySelectorAll(".toolbar-button").forEach(btn => {
     const value = btn.dataset.value || null;
 
     if (btn.dataset.checklist === "true") {
-      document.execCommand("insertUnorderedList", false, null);
+      document.execCommand("insertUnorderedList");
     } else {
       document.execCommand(cmd, false, value);
     }
@@ -686,14 +540,13 @@ document.querySelectorAll(".toolbar-button").forEach(btn => {
     noteEditorContent.focus();
   });
 });
-
 /* =========================
-   POMODORO + STATS
+   POMODORO
 ========================= */
 
 function getCustomTime() {
-  const h = parseInt(hourInput?.value || "0", 10) || 0;
-  const m = parseInt(minuteInput?.value || "0", 10) || 0;
+  const h = parseInt(hourInput.value || "0", 10);
+  const m = parseInt(minuteInput.value || "0", 10);
   const seconds = h * 3600 + m * 60;
   return seconds > 0 ? seconds : 1500;
 }
@@ -706,8 +559,7 @@ function updateTimerDisplay() {
 
 function updateRing() {
   if (!ring) return;
-  const percent = remainingSeconds / totalSeconds;
-  ring.style.strokeDashoffset = circumference * (1 - percent);
+  ring.style.strokeDashoffset = circumference * (1 - remainingSeconds / totalSeconds);
 }
 
 function savePomodoroStats() {
@@ -715,13 +567,12 @@ function savePomodoroStats() {
 }
 
 function renderPomodoroStats() {
-  if (!pomodoroStatsSessions || !pomodoroStatsTime) return;
   pomodoroStatsSessions.textContent = `sessions: ${pomodoroStats.sessions}`;
   const minutes = Math.round(pomodoroStats.seconds / 60);
   pomodoroStatsTime.textContent = `focused time: ${minutes} min`;
 }
 
-document.getElementById("pomodoro-toggle")?.addEventListener("click", () => {
+document.getElementById("pomodoro-toggle").addEventListener("click", () => {
   const btn = document.getElementById("pomodoro-toggle");
 
   if (timerInterval) {
@@ -738,6 +589,7 @@ document.getElementById("pomodoro-toggle")?.addEventListener("click", () => {
 
   timerInterval = setInterval(() => {
     remainingSeconds--;
+
     if (remainingSeconds <= 0) {
       remainingSeconds = 0;
       updateTimerDisplay();
@@ -754,6 +606,7 @@ document.getElementById("pomodoro-toggle")?.addEventListener("click", () => {
 
       return;
     }
+
     updateTimerDisplay();
     updateRing();
   }, 1000);
@@ -761,7 +614,7 @@ document.getElementById("pomodoro-toggle")?.addEventListener("click", () => {
   btn.textContent = "pause";
 });
 
-document.getElementById("pomodoro-reset")?.addEventListener("click", () => {
+document.getElementById("pomodoro-reset").addEventListener("click", () => {
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
@@ -776,8 +629,12 @@ document.getElementById("pomodoro-reset")?.addEventListener("click", () => {
 });
 
 /* =========================
-   INITIAL RENDER (after onboarding finishes)
+   INITIAL RENDER
 ========================= */
 
 updateTimerDisplay();
 updateRing();
+renderTodos();
+renderDecks();
+renderNotes();
+renderPomodoroStats();
