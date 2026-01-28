@@ -1,3 +1,15 @@
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 500); 
+        }
+    }, 1200); 
+});
+
 function $(id) {
   return document.getElementById(id);
  }
@@ -636,5 +648,17 @@ document.getElementById('settings-reset-app').addEventListener('click', () => {
     if (confirm("Are you absolutely sure? This will delete all your data and take you back to onboarding.")) {
         localStorage.clear(); 
         window.location.reload(); 
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const resetBtn = document.getElementById('settings-reset-app');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (confirm("Are you sure? This will wipe all your data and restart the app.")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        });
     }
 });
