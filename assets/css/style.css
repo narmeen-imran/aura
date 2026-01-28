@@ -16,7 +16,6 @@
   --blur: 22px;
 }
  
-/* Dark theme */
  [data-theme="dark"] {
   --bg: #000000;
   --text: #ffffff;
@@ -26,7 +25,6 @@
   --glass-border: rgba(255, 255, 255, 0.18);
  }
  
- /* RESET */
  *
  ,
  *::before,
@@ -50,10 +48,9 @@
   justify-content: center;
   align-items: stretch;
   overflow-y: auto;
-  overflow-x: hidden; /* Prevent body-level horizontal scroll */
+  overflow-x: hidden; 
  }
  
- /* APP SHELL */
  #app-root {
   width: 100%;
   max-width: 480px;
@@ -70,7 +67,6 @@
   padding-bottom: 100px;
  }
  
- /* ONBOARDING */
  #onboarding-screen {
   position: fixed;
   inset: 0;
@@ -121,7 +117,6 @@
   cursor: pointer;
  }
  
- /* BODY */
  .onboarding-body {
   flex: 1;
   display: flex;
@@ -161,7 +156,6 @@
   color: #ffffff;
  }
  
- /* Checkbox pills */
  .checkbox-pill {
   display: inline-flex;
   align-items: center;
@@ -182,7 +176,6 @@
   color: var(--grad-start);
  }
  
- /* SCREENS */
  .aura-screen {
   display: none;
   animation: fadeIn 0.2s ease-out;
@@ -198,7 +191,6 @@
  }
  }
  
- /* HEADERS */
  .screen-header {
   display: flex;
   justify-content: space-between;
@@ -218,7 +210,6 @@
   font-weight: 600;
  }
  
- /* GLASS CARDS */
  .glass-card {
   background: var(--glass);
   border-radius: var(--radius-lg);
@@ -245,7 +236,6 @@
   font-size: 14px;
  }
  
- /* BUTTONS */
  .primary-button,
  .ghost-button,
  .icon-button {
@@ -284,7 +274,6 @@
  .danger { color: #d00000;
  }
  
- /* TODO LIST */
  .todo-list {
   list-style: none;
   padding: 0;
@@ -306,7 +295,6 @@
   position: relative;
  }
  
- /* DECKS */
  .deck-grid {
   display: flex;
   flex-direction: column;
@@ -321,7 +309,6 @@
   cursor: pointer;
  }
  
- /* FLASHCARDS */
  .flashcard-wrapper {
   position: relative;
  }
@@ -370,7 +357,6 @@
   margin-top: 10px;
  }
  
- /* FLASHCARD MODAL */
  .modal-overlay {
   position: fixed;
   inset: 0;
@@ -421,7 +407,6 @@
   margin-top: 10px;
  }
  
- /* NOTES SCREEN LIST */
  .notes-grid {
   display: flex;
   flex-direction: column;
@@ -432,7 +417,6 @@
   margin-bottom: 10px;
  }
  
- /* TIMER */
  .timer-card {
   display: flex;
   flex-direction: column;
@@ -483,7 +467,6 @@
   margin-top: 14px;
  }
  
- /* NAVBAR */
  .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -511,7 +494,6 @@
   color: var(--grad-start);
  }
  
- /* SCROLLBAR */
  .app-main::-webkit-scrollbar {
   width: 4px;
  }
@@ -521,11 +503,6 @@
   border-radius: 999px;
  }
 
- /* =========================================================
-  NOTE EDITOR — APPLE NOTES STYLE UPGRADE
- ========================================================= 
- */
- 
  .note-editor-overlay {
   position: fixed;
   inset: 0;
@@ -540,7 +517,6 @@
   display: flex !important;
  }
 
- /* Lock editor width and hide horizontal scroll */
  .note-editor {
   position: fixed;
   inset: 0;
@@ -574,10 +550,9 @@
   margin: 0;
  }
  
- /* FIX: WRAPPING TOOLBAR BUTTONS */
  .note-toolbar {
   display: flex;
-  flex-wrap: wrap; /* Wraps buttons to new line instead of stretching frame */
+  flex-wrap: wrap; 
   gap: 8px;
   padding: 12px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.08);

@@ -500,7 +500,6 @@ function $(id) {
     document.execCommand(command, false, value);
   });
  });
-
  
  on("settings-theme-toggle", "click", () => {
   const root = document.documentElement;
