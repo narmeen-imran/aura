@@ -802,26 +802,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
 
 
 
-document.getElementById('settings-reset-app').addEventListener('click', () => {
-    if (confirm("Are you absolutely sure? This will delete all your data and take you back to onboarding.")) {
-        localStorage.clear();
-        window.location.reload();
-    }
-});
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const resetBtn = document.getElementById('settings-reset-app');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (confirm("Are you sure? This will wipe all your data and restart the app.")) {
-                localStorage.clear();
-                window.location.reload();
-            }
-        });
-    }
+on("settings-reset-app", "click", () => {
+  openGlobalModal("reset everything?", "type RESET to confirm", "reset");
 });
 
 
@@ -844,7 +826,6 @@ function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-input").focus();
 }
 
-// This logic happens ONLY when you click "Confirm" in the box
 on("global-modal-save", "click", () => {
     const val = $("global-modal-input").value.trim();
     if (!val) return;
@@ -863,7 +844,19 @@ on("global-modal-save", "click", () => {
         userName = val;
         localStorage.setItem("aura-username", val);
         if($("home-greeting")) $("home-greeting").textContent = `hello, ${val}`;
+    } 
+    // THIS PART HANDLES THE RESET
+    else if (currentAction === "reset") {
+        if (val === "RESET") {
+            localStorage.clear();
+            window.location.reload();
+        } else {
+            $("global-modal-input").value = "";
+            $("global-modal-input").placeholder = "Try again: type RESET";
+            return; // Keeps the box open if they get it wrong
+        }
     }
+    
     $("global-modal").classList.remove("is-visible");
 });
 
@@ -871,3 +864,22 @@ on("global-modal-save", "click", () => {
 on("global-modal-cancel", "click", () => {
     $("global-modal").classList.remove("is-visible");
 });
+// REPLACE WITH THIS:
+function openGlobalModal(title, placeholder, actionType) {
+    $("global-modal-title").textContent = title;
+    $("global-modal-input").placeholder = placeholder;
+    $("global-modal-input").value = "";
+    currentAction = actionType;
+    
+    // This turns the button RED for Reset, and BLACK for everything else
+    if (actionType === "reset") {
+        $("global-modal-save").style.backgroundColor = "#ff4444";
+        $("global-modal-save").style.color = "white";
+    } else {
+        $("global-modal-save").style.backgroundColor = ""; 
+        $("global-modal-save").style.color = "";
+    }
+
+    $("global-modal").classList.add("is-visible");
+    $("global-modal-input").focus();
+}
