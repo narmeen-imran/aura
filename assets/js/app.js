@@ -731,11 +731,13 @@ function openGlobalModal(title, placeholder, actionType) {
     const saveBtn = $("global-modal-save");
 
     if (actionType === "reset") {
-        saveBtn.style.backgroundColor = "#ff4444";
-        saveBtn.style.color = "#ffffff"; 
+        saveBtn.style.color = "#ff4444"; 
+        saveBtn.style.fontWeight = "bold";
+        saveBtn.style.backgroundColor = "rgba(255, 68, 68, 0.1)"; 
     } else {
-        saveBtn.style.backgroundColor = ""; 
-        saveBtn.style.color = "";
+        saveBtn.style.color = ""; 
+        saveBtn.style.fontWeight = "";
+        saveBtn.style.backgroundColor = "";
     }
 
     $("global-modal").classList.add("is-visible");
