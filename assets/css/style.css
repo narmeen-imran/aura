@@ -585,6 +585,15 @@ body {
   padding: 12px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
+.note-toolbar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;          /* allow wrapping */
+  overflow-x: hidden;       /* no horizontal scroll */
+}
+
 
 .note-toolbar .toolbar-button {
   background: transparent;
@@ -613,13 +622,13 @@ body {
   margin: 20px;
 }
 
-/* Placeholder for contenteditable */
 .note-editor-content:empty:before {
   content: "Start writing…";
-  color: rgba(255,255,255,0.4);
+  color: var(--text-soft);
   pointer-events: none;
   font-style: italic;
 }
+
 
 /* Save button fixed above navbar */
 .save-note-fixed {
@@ -650,4 +659,20 @@ body {
   color: #ff6b6b;
   border: 1px solid rgba(255,0,0,0.3);
   font-size: 15px;
+}
+.note-editor-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.note-title-input {
+  flex: 1;                 /* title takes left side */
+}
+
+.note-editor-actions {
+  display: flex;
+  gap: 8px;
 }

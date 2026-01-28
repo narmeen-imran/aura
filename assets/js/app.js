@@ -507,19 +507,6 @@ on("delete-note-button", "click", () => {
   noteEditorOverlay.style.display = "none";
 });
 
-/* BIG DELETE BUTTON */
-on("delete-note-big", "click", () => {
-  const editing = noteEditorOverlay.dataset.editing;
-  if (editing === "new") {
-    noteEditorOverlay.style.display = "none";
-    return;
-  }
-
-  notes.splice(Number(editing), 1);
-  saveNotes();
-  renderNotes();
-  noteEditorOverlay.style.display = "none";
-});
 
 /* PIN NOTE */
 on("pin-note-button", "click", () => {
