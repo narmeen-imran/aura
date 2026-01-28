@@ -629,7 +629,6 @@
   font-size: 15px;
  }
 
-
  .note-editor .ghost-button,
  .note-editor .icon-button,
  .note-editor .primary-button {
@@ -638,11 +637,9 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
  }
 
-
  .note-tags-row {
   display: none !important;
  }
-
 
 #splash-screen {
     position: fixed;
@@ -655,7 +652,6 @@
     transition: opacity 0.5s ease;
 }
 
-
 .splash-logo {
     width: 245px;
     height: 245px;
@@ -663,33 +659,30 @@
     animation: splashPulse 1.5s infinite ease-in-out;
 }
 
-
 @keyframes splashPulse {
     0% { transform: scale(1); opacity: 0.8; }
     50% { transform: scale(1.05); opacity: 1; }
     100% { transform: scale(1); opacity: 0.8; }
 }
 
-
 .fade-out {
     opacity: 0;
     pointer-events: none;
 }
-/* Styling the Global Modal */
+
 #global-modal {
-    z-index: 9999; /* Ensures it stays above all other screens */
+    z-index: 9999; 
 }
 
 #global-modal .modal-card {
     border: 2px solid var(--glass-border);
 }
 
-/* Ensure inputs in modal look consistent with onboarding */
 #global-modal-input {
     width: 100%;
     margin-bottom: 10px;
 }
-/* This makes the text inside the modal buttons look clear */
+
 #global-modal-save {
     font-weight: 700;
     transition: all 0.2s ease;

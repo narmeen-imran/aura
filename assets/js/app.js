@@ -10,9 +10,6 @@ window.addEventListener('load', () => {
     }, 1200);
 });
 
-
-
-
 function $(id) {
   return document.getElementById(id);
  }
@@ -34,10 +31,6 @@ function $(id) {
  let timerInterval = null;
  let totalSeconds = 1500;
  let remainingSeconds = 1500;
-
-
-
-
  const appRoot = $("app-root");
  const notesList = $("notes-list");
  const notesSearchInput = $("notes-search-input");
@@ -46,16 +39,13 @@ function $(id) {
  const noteEditorContent = $("note-editor-content");
  const noteTagsInput = $("note-tags-input");
  const pinNoteButton = $("pin-note-button");
- 
  const flashcard = $("flashcard");
  const flashcardFront = $("flashcard-front");
  const flashcardBack = $("flashcard-back");
  const flashcardProgress = $("flashcard-progress");
- 
  const flashcardFrontInput = $("flashcard-front-input");
  const flashcardBackInput = $("flashcard-back-input");
  const flashcardModal = $("flashcard-modal");
- 
  const timerDisplay = $("pomodoro-time");
  const hourInput = $("timer-hours");
  const minuteInput = $("timer-minutes");
@@ -65,9 +55,6 @@ function $(id) {
   if (el) el.addEventListener(event, handler);
  }
 
-
-
-
  function showScreen(name) {
   document.querySelectorAll(".aura-screen").forEach(screen => {
     screen.classList.remove("is-active");
@@ -75,9 +62,6 @@ function $(id) {
       screen.classList.add("is-active");
     }
   });
-
-
-
 
   document.querySelectorAll(".bottom-nav-item").forEach(btn => {
     btn.classList.toggle("is-active", btn.dataset.screenTarget === name);
@@ -97,18 +81,12 @@ function $(id) {
   document.querySelector('[data-step="2"]').style.display = "block";
  });
 
-
-
-
  on("onboarding-next-2", "click", () => {
   const age = $("onboarding-age-input").value.trim();
   if (!age) return;
  
   userAge = age;
   localStorage.setItem("aura-age", userAge);
-
-
-
 
   document.querySelector('[data-step="2"]').style.display = "none";
   document.querySelector('[data-step="3"]').style.display = "block";
@@ -127,9 +105,6 @@ function $(id) {
   $("home-greeting").textContent = `hello, ${userName}`;
  });
 
-
-
-
  document.querySelectorAll(".onboarding-back-button").forEach(btn => {
   btn.addEventListener("click", () => {
     const backStep = btn.dataset.backStep;
@@ -140,18 +115,12 @@ function $(id) {
   });
  });
 
-
-
-
  document.querySelectorAll(".bottom-nav-item").forEach(btn => {
   btn.addEventListener("click", () => {
     const target = btn.dataset.screenTarget;
     if (target) showScreen(target);
   });
  });
-
-
-
 
  function saveTodos() {
   localStorage.setItem("aura-todos", JSON.stringify(todos));
@@ -171,9 +140,6 @@ function $(id) {
     list.appendChild(li);
   });
 
-
-
-
   document.querySelectorAll(".todo-delete").forEach(btn => {
     btn.addEventListener("click", () => {
       const index = btn.dataset.index;
@@ -192,9 +158,6 @@ function $(id) {
   saveTodos();
   renderTodos();
  });
-
-
-
 
  function saveDecks() {
   localStorage.setItem("aura-decks", JSON.stringify(decks));
@@ -223,9 +186,6 @@ function $(id) {
 on("add-deck-button", "click", () => {
   openGlobalModal("new deck", "name your deck", "deck");
 });
-
-
-
 
  function openDeck(name) {
   currentDeck = name;
@@ -263,9 +223,6 @@ on("add-deck-button", "click", () => {
   flashcard.classList.toggle("is-flipped");
  });
 
-
-
-
  on("flashcard-next", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
@@ -275,9 +232,6 @@ on("add-deck-button", "click", () => {
   renderFlashcard();
  });
 
-
-
-
  on("flashcard-prev", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
@@ -286,9 +240,6 @@ on("add-deck-button", "click", () => {
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
  });
-
-
-
 
  on("add-card-button", "click", () => {
   $("flashcard-modal-title").textContent = "add card";
@@ -300,15 +251,9 @@ on("add-deck-button", "click", () => {
   flashcardModal.classList.add("is-visible");
  });
 
-
-
-
  on("edit-card-button", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
-
-
-
 
   $("flashcard-modal-title").textContent = "edit card";
  
@@ -319,9 +264,6 @@ on("add-deck-button", "click", () => {
   flashcardModal.dataset.mode = "edit";
   flashcardModal.classList.add("is-visible");
  });
-
-
-
 
  on("flashcard-modal-save", "click", () => {
   const front = flashcardFrontInput.value.trim();
@@ -346,9 +288,6 @@ on("add-deck-button", "click", () => {
   renderFlashcard();
  });
 
-
-
-
  on("flashcard-modal-cancel", "click", () => {
   flashcardModal.classList.remove("is-visible");
  });
@@ -363,9 +302,6 @@ on("add-deck-button", "click", () => {
   saveDecks();
   renderFlashcard();
  });
-
-
-
 
  on("rename-deck-button", "click", () => {
   openGlobalModal("rename deck", "enter new name", "rename-deck");
@@ -389,9 +325,6 @@ on("add-deck-button", "click", () => {
  
   $("deck-viewer-title").textContent = trimmed;
  });
-
-
-
 
  on("delete-deck-button", "click", () => {
   if (!confirm("delete this deck?")) return;
@@ -426,9 +359,6 @@ on("add-deck-button", "click", () => {
       return b.updatedAt - a.updatedAt;
     });
 
-
-
-
   filtered.forEach(n => {
     const card = document.createElement("div");
     card.className = "glass-card note-card";
@@ -442,7 +372,6 @@ on("add-deck-button", "click", () => {
     `;
  let currentAction = null;
 
-
 function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-title").textContent = title;
     $("global-modal-input").placeholder = placeholder;
@@ -452,8 +381,6 @@ function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-input").focus();
 }
 
-
-// Logic for the Save/Cancel buttons
 on("global-modal-save", "click", () => {
     const val = $("global-modal-input").value.trim();
     if (!val) return;
@@ -485,7 +412,6 @@ on("global-modal-save", "click", () => {
     $("global-modal").classList.remove("is-visible");
 });
 
-
 on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-visible"));
 
 
@@ -494,15 +420,9 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   });
  }
 
-
-
-
  function openNoteEditor(index = null) {
   noteEditorOverlay.classList.add("is-visible");
   noteEditorOverlay.style.display = "flex";
-
-
-
 
   if (index === null) {
     noteEditorOverlay.dataset.editing = "new";
@@ -528,9 +448,6 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   openNoteEditor(null);
  });
 
-
-
-
  on("quick-note-button", "click", () => {
   openNoteEditor(null);
  });
@@ -539,9 +456,6 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   noteEditorOverlay.classList.remove("is-visible");
   noteEditorOverlay.style.display = "none";
  });
-
-
-
 
  on("save-note-button", "click", () => {
   const title = noteEditorTitle.value.trim();
@@ -583,9 +497,6 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   noteEditorOverlay.style.display = "none";
  });
 
-
-
-
  on("delete-note-button", "click", () => {
   const editing = noteEditorOverlay.dataset.editing;
   if (editing === "new") {
@@ -604,25 +515,16 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   noteEditorOverlay.style.display = "none";
  });
 
-
-
-
  on("pin-note-button", "click", () => {
   const pinned = pinNoteButton.dataset.pinned === "true";
   pinNoteButton.dataset.pinned = pinned ? "false" : "true";
   pinNoteButton.textContent = pinned ? "pin" : "unpin";
  });
 
-
-
-
  notesSearchInput.addEventListener("input", () => {
   noteSearchQuery = notesSearchInput.value.trim();
   renderNotes();
  });
-
-
-
 
  document.querySelectorAll(".toolbar-button").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -646,9 +548,6 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   localStorage.setItem("aura-theme", next);
  });
 
-
-
-
  on("settings-change-name", "click", () => {
   openGlobalModal("change name", "new name", "name");
  
@@ -662,9 +561,6 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
     }
   }
  });
-
-
-
 
  function savePomodoroStats() {
   localStorage.setItem("aura-pomodoro-stats", JSON.stringify(pomodoroStats));
@@ -691,17 +587,11 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   ring.style.strokeDashoffset = offset;
  }
 
-
-
-
  function formatTime(sec) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
  }
-
-
-
 
  on("pomodoro-toggle", "click", () => {
   if (timerInterval) {
@@ -740,9 +630,6 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   }, 1000);
  });
 
-
-
-
  on("pomodoro-reset", "click", () => {
   clearInterval(timerInterval);
   timerInterval = null;
@@ -755,25 +642,16 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   $("pomodoro-toggle").textContent = "start";
  });
 
-
-
-
  function init() {
   renderTodos();
   renderDecks();
   renderNotes();
   renderPomodoroStats();
 
-
-
-
   const savedTheme = localStorage.getItem("aura-theme");
   if (savedTheme) {
     document.documentElement.setAttribute("data-theme", savedTheme);
   }
-
-
-
 
   if (userName) {
     onboardingScreen.style.display = "none";
@@ -787,36 +665,16 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
     document.querySelector('[data-step="3"]').style.display = "none";
   }
 
-
-
-
   timerDisplay.textContent = formatTime(remainingSeconds);
   updateRing();
  }
-
-
-
-
  init();
-
-
-
-
 on("settings-reset-app", "click", () => {
   openGlobalModal("reset everything?", "type RESET to confirm", "reset");
 });
 
-
-
-
-
-
-
-
-
 let currentAction = null; 
 
-// This function makes the popup appear
 function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-title").textContent = title;
     $("global-modal-input").placeholder = placeholder;
@@ -845,7 +703,7 @@ on("global-modal-save", "click", () => {
         localStorage.setItem("aura-username", val);
         if($("home-greeting")) $("home-greeting").textContent = `hello, ${val}`;
     } 
-    // THIS PART HANDLES THE RESET
+
     else if (currentAction === "reset") {
         if (val === "RESET") {
             localStorage.clear();
@@ -853,19 +711,17 @@ on("global-modal-save", "click", () => {
         } else {
             $("global-modal-input").value = "";
             $("global-modal-input").placeholder = "Try again: type RESET";
-            return; // Keeps the box open if they get it wrong
+            return; 
         }
     }
     
     $("global-modal").classList.remove("is-visible");
 });
 
-// This makes the "Cancel" button work
 on("global-modal-cancel", "click", () => {
     $("global-modal").classList.remove("is-visible");
 });
-// REPLACE WITH THIS:
-// REPLACE your current openGlobalModal with THIS:
+
 function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-title").textContent = title;
     $("global-modal-input").placeholder = placeholder;
@@ -874,12 +730,10 @@ function openGlobalModal(title, placeholder, actionType) {
     
     const saveBtn = $("global-modal-save");
 
-    // This turns the button RED and the text WHITE for Reset
     if (actionType === "reset") {
         saveBtn.style.backgroundColor = "#ff4444";
-        saveBtn.style.color = "#ffffff"; // This makes "confirm" white
+        saveBtn.style.color = "#ffffff"; 
     } else {
-        // This puts it back to normal for Tasks and Decks
         saveBtn.style.backgroundColor = ""; 
         saveBtn.style.color = "";
     }
