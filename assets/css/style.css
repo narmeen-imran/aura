@@ -650,9 +650,9 @@
 }
 
 .splash-logo {
-    width: 220px;
-    height: 220px;
-    border-radius: 40px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50px;
     animation: splashPulse 1.5s infinite ease-in-out;
 }
 
