@@ -689,3 +689,8 @@
     width: 100%;
     margin-bottom: 10px;
 }
+/* This makes the text inside the modal buttons look clear */
+#global-modal-save {
+    font-weight: 700;
+    transition: all 0.2s ease;
+}

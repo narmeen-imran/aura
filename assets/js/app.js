@@ -865,19 +865,23 @@ on("global-modal-cancel", "click", () => {
     $("global-modal").classList.remove("is-visible");
 });
 // REPLACE WITH THIS:
+// REPLACE your current openGlobalModal with THIS:
 function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-title").textContent = title;
     $("global-modal-input").placeholder = placeholder;
     $("global-modal-input").value = "";
     currentAction = actionType;
     
-    // This turns the button RED for Reset, and BLACK for everything else
+    const saveBtn = $("global-modal-save");
+
+    // This turns the button RED and the text WHITE for Reset
     if (actionType === "reset") {
-        $("global-modal-save").style.backgroundColor = "#ff4444";
-        $("global-modal-save").style.color = "white";
+        saveBtn.style.backgroundColor = "#ff4444";
+        saveBtn.style.color = "#ffffff"; // This makes "confirm" white
     } else {
-        $("global-modal-save").style.backgroundColor = ""; 
-        $("global-modal-save").style.color = "";
+        // This puts it back to normal for Tasks and Decks
+        saveBtn.style.backgroundColor = ""; 
+        saveBtn.style.color = "";
     }
 
     $("global-modal").classList.add("is-visible");
