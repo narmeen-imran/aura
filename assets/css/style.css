@@ -676,3 +676,92 @@ body {
   display: flex;
   gap: 8px;
 }
+/* =========================================================
+   NOTE EDITOR — APPLE NOTES STYLE UPGRADE (SAFE)
+========================================================= */
+
+/* Remove tags row */
+.note-tags-row {
+  display: none !important;
+}
+
+/* Full-height editor layout */
+.note-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-bottom: 90px;
+}
+
+/* Header spacing */
+.note-editor-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.note-title-input {
+  flex: 1;
+}
+
+/* Action buttons spacing */
+.note-editor-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Close button slightly bigger */
+.note-editor .icon-button {
+  padding: 8px 12px;
+  font-size: 16px;
+}
+
+/* Toolbar — no horizontal scroll */
+.note-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  overflow-x: hidden;
+}
+
+/* Writing area */
+.note-editor-content {
+  flex: 1;
+  padding: 24px;
+  font-size: 18px;
+  line-height: 1.7;
+  overflow-y: auto;
+  background: transparent;
+  color: inherit;
+  letter-spacing: 0.2px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  margin: 20px;
+}
+
+/* Placeholder visible in light + dark */
+.note-editor-content:empty:before {
+  content: "Start writing…";
+  color: var(--text-soft);
+  pointer-events: none;
+  font-style: italic;
+}
+
+/* Save button */
+.save-note-fixed {
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  border-radius: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px);
+  color: inherit !important;
+  border: 1px solid rgba(255,255,255,0.2);
+}

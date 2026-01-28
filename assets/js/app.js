@@ -374,13 +374,17 @@ on("delete-deck-button", "click", () => {
   showScreen("flashcards");
 });
 /* =========================================================
-   NOTES (UPDATED)
+   NOTES (UPDATED + CONFIRM DELETE + UNDO)
 ========================================================= */
 
+let lastDeletedNote = null;
+
+/* Save notes */
 function saveNotes() {
   localStorage.setItem("aura-notes", JSON.stringify(notes));
 }
 
+/* Render notes */
 function renderNotes() {
   notesList.innerHTML = "";
 
@@ -417,13 +421,14 @@ function renderNotes() {
   });
 }
 
-/* OPEN NOTE EDITOR */
+/* Open editor */
 function openNoteEditor(index = null) {
+  noteEditorOverlay.dataset.editing = index === null ? "new" : index;
+
   noteEditorOverlay.classList.add("is-visible");
   noteEditorOverlay.style.display = "flex";
 
   if (index === null) {
-    noteEditorOverlay.dataset.editing = "new";
     noteEditorTitle.value = "";
     noteEditorContent.innerHTML = "";
     noteTagsInput.value = "";
@@ -431,28 +436,25 @@ function openNoteEditor(index = null) {
     pinNoteButton.textContent = "pin";
   } else {
     const note = notes[index];
-    noteEditorOverlay.dataset.editing = index;
-
     noteEditorTitle.value = note.title;
     noteEditorContent.innerHTML = note.content;
     noteTagsInput.value = note.tags;
-
     pinNoteButton.dataset.pinned = note.pinned ? "true" : "false";
     pinNoteButton.textContent = note.pinned ? "unpin" : "pin";
   }
 }
 
-/* OPEN NEW NOTE BUTTONS */
+/* New note buttons */
 on("add-note-button", "click", () => openNoteEditor(null));
 on("quick-note-button", "click", () => openNoteEditor(null));
 
-/* CLOSE EDITOR */
+/* Close editor */
 on("close-note-editor", "click", () => {
   noteEditorOverlay.classList.remove("is-visible");
   noteEditorOverlay.style.display = "none";
 });
 
-/* SAVE NOTE */
+/* Save note */
 on("save-note-button", "click", () => {
   const title = noteEditorTitle.value.trim();
   const content = noteEditorContent.innerHTML.trim();
@@ -493,35 +495,50 @@ on("save-note-button", "click", () => {
   noteEditorOverlay.style.display = "none";
 });
 
-/* SMALL DELETE BUTTON */
+/* Delete note (with confirm + undo) */
 on("delete-note-button", "click", () => {
   const editing = noteEditorOverlay.dataset.editing;
+
   if (editing === "new") {
     noteEditorOverlay.style.display = "none";
     return;
   }
 
-  notes.splice(Number(editing), 1);
+  if (!confirm("Delete this note?")) return;
+
+  const index = Number(editing);
+
+  lastDeletedNote = { note: notes[index], index };
+
+  notes.splice(index, 1);
   saveNotes();
   renderNotes();
+
   noteEditorOverlay.style.display = "none";
+
+  setTimeout(() => {
+    if (confirm("Undo delete?")) {
+      notes.splice(lastDeletedNote.index, 0, lastDeletedNote.note);
+      saveNotes();
+      renderNotes();
+    }
+  }, 200);
 });
 
-
-/* PIN NOTE */
+/* Pin note */
 on("pin-note-button", "click", () => {
   const pinned = pinNoteButton.dataset.pinned === "true";
   pinNoteButton.dataset.pinned = pinned ? "false" : "true";
   pinNoteButton.textContent = pinned ? "pin" : "unpin";
 });
 
-/* SEARCH NOTES */
+/* Search notes */
 notesSearchInput.addEventListener("input", () => {
   noteSearchQuery = notesSearchInput.value.trim();
   renderNotes();
 });
 
-/* TOOLBAR — FIX KEYBOARD DROPPING */
+/* Toolbar fix */
 document.querySelectorAll(".toolbar-button").forEach(btn => {
   btn.addEventListener("mousedown", e => e.preventDefault());
   btn.addEventListener("click", () => {
@@ -536,147 +553,3 @@ document.querySelectorAll(".toolbar-button").forEach(btn => {
     document.execCommand(command, false, value);
   });
 });
-
-/* =========================================================
-   THEME TOGGLE
-========================================================= */
-
-on("settings-theme-toggle", "click", () => {
-  const root = document.documentElement;
-  const current = root.getAttribute("data-theme");
-  const next = current === "light" ? "dark" : "light";
-  root.setAttribute("data-theme", next);
-  localStorage.setItem("aura-theme", next);
-});
-
-/* =========================================================
-   TIMER + STATS
-========================================================= */
-
-function savePomodoroStats() {
-  localStorage.setItem("aura-pomodoro-stats", JSON.stringify(pomodoroStats));
-}
-
-function renderPomodoroStats() {
-  $("pomodoro-stats-sessions").textContent = `sessions: ${pomodoroStats.sessions}`;
-  $("pomodoro-stats-time").textContent = `focused time: ${Math.floor(pomodoroStats.seconds / 60)} min`;
-}
-
-const ring = document.querySelector(".timer-ring-progress");
-const radius = 90;
-const circumference = 2 * Math.PI * radius;
-
-ring.style.strokeDasharray = circumference;
-ring.style.strokeDashoffset = 0;
-
-function updateRing() {
-  if (totalSeconds <= 0) {
-    ring.style.strokeDashoffset = 0;
-    return;
-  }
-  const progress = remainingSeconds / totalSeconds;
-  const offset = circumference * (1 - progress);
-  ring.style.strokeDashoffset = offset;
-}
-
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-on("pomodoro-toggle", "click", () => {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    $("pomodoro-toggle").textContent = "start";
-    return;
-  }
-
-  if (remainingSeconds === totalSeconds) {
-    const hours = Number(hourInput.value) || 0;
-    const minutes = Number(minuteInput.value) || 0;
-
-    totalSeconds = hours * 3600 + minutes * 60;
-    remainingSeconds = totalSeconds;
-
-    if (totalSeconds <= 0) {
-      alert("set a valid time.");
-      return;
-    }
-
-    timerDisplay.textContent = formatTime(remainingSeconds);
-    updateRing();
-  }
-
-  timerInterval = setInterval(() => {
-    remainingSeconds--;
-
-    timerDisplay.textContent = formatTime(remainingSeconds);
-    updateRing();
-
-    if (remainingSeconds <= 0) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-
-      pomodoroStats.sessions++;
-      pomodoroStats.seconds += totalSeconds;
-      savePomodoroStats();
-      renderPomodoroStats();
-
-      $("pomodoro-toggle").textContent = "start";
-      remainingSeconds = totalSeconds;
-      updateRing();
-    }
-  }, 1000);
-});
-
-on("pomodoro-reset", "click", () => {
-  clearInterval(timerInterval);
-  timerInterval = null;
-
-  const hours = Number(hourInput.value) || 0;
-  const minutes = Number(minuteInput.value) || 0;
-
-  totalSeconds = hours * 3600 + minutes * 60;
-  remainingSeconds = totalSeconds;
-
-  timerDisplay.textContent = formatTime(remainingSeconds);
-  updateRing();
-
-  $("pomodoro-toggle").textContent = "start";
-});
-
-/* =========================================================
-   INIT
-========================================================= */
-
-function init() {
-  renderTodos();
-  renderDecks();
-  renderNotes();
-  renderPomodoroStats();
-
-  const savedTheme = localStorage.getItem("aura-theme");
-  if (savedTheme) {
-    document.documentElement.setAttribute("data-theme", savedTheme);
-  }
-
-  if (userName) {
-    onboardingScreen.style.display = "none";
-    appRoot.style.display = "flex";
-    $("home-greeting").textContent = `hello, ${userName}`;
-  } else {
-    onboardingScreen.style.display = "block";
-    appRoot.style.display = "none";
-
-    document.querySelector('[data-step="1"]').style.display = "block";
-    document.querySelector('[data-step="2"]').style.display = "none";
-    document.querySelector('[data-step="3"]').style.display = "none";
-  }
-
-  timerDisplay.textContent = formatTime(remainingSeconds);
-  updateRing();
-}
-
-init();
