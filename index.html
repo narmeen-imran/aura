@@ -20,7 +20,6 @@
       <header class="onboarding-header">
         <span class="onboarding-back-placeholder"></span>
       </header>
-
       <div class="onboarding-body">
         <h1 class="onboarding-title">hey, i'm aura</h1>
         <p class="onboarding-subtitle">let's set things up so i can support you properly.</p>
@@ -36,7 +35,6 @@
       <header class="onboarding-header">
         <button class="onboarding-back-button" data-back-step="1"></button>
       </header>
-
       <div class="onboarding-body">
         <h1 class="onboarding-title">nice to meet you</h1>
         <p class="onboarding-subtitle">this helps me keep things personal.</p>
@@ -52,7 +50,6 @@
       <header class="onboarding-header">
         <button class="onboarding-back-button" data-back-step="2"></button>
       </header>
-
       <div class="onboarding-body">
         <h1 class="onboarding-title">what brings you here?</h1>
         <p class="onboarding-subtitle">choose as many as you like.</p>
@@ -87,6 +84,7 @@
 </div>
 
 <div id="app-root">
+
   <main class="app-main">
 
     <section class="aura-screen is-active" data-screen="home">
@@ -125,7 +123,6 @@
 
         <button id="add-deck-button" class="primary-button small">new deck</button>
       </header>
-
       <section id="deck-grid" class="deck-grid"></section>
     </section>
 
@@ -197,6 +194,7 @@
 
       <section id="notes-list" class="notes-grid"></section>
     </section>
+
     <section class="aura-screen" data-screen="timer">
       <header class="screen-header">
         <div>
@@ -266,6 +264,7 @@
   </nav>
 </div>
 
+<!-- ⭐ NOTE EDITOR (ONLY CHANGE: delete button added) -->
 <div id="note-editor-overlay" class="note-editor-overlay">
   <div class="note-editor">
     <header class="note-editor-header">
@@ -295,6 +294,10 @@
     <div id="note-editor-content" class="note-editor-content" contenteditable="true"></div>
 
     <button id="save-note-button" class="primary-button full-width save-note-fixed">save note</button>
+
+    <!-- ⭐ NEW BIG DELETE BUTTON (ONLY CHANGE MADE) -->
+    <button id="delete-note-big" class="delete-note-fixed">delete note</button>
+
   </div>
 </div>
 

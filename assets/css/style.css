@@ -315,7 +315,6 @@ body {
   padding: 12px;
   cursor: pointer;
 }
-
 /* FLASHCARDS */
 .flashcard-wrapper {
   position: relative;
@@ -557,7 +556,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding-bottom: 90px; /* space for save button */
+  padding-bottom: 140px; /* space for save + delete buttons */
 }
 
 /* Cleaner header */
@@ -594,6 +593,9 @@ body {
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Apple Notes–style writing area */
@@ -606,12 +608,23 @@ body {
   background: transparent;
   color: inherit;
   letter-spacing: 0.2px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  margin: 20px;
+}
+
+/* Placeholder for contenteditable */
+.note-editor-content:empty:before {
+  content: "Start writing…";
+  color: rgba(255,255,255,0.4);
+  pointer-events: none;
+  font-style: italic;
 }
 
 /* Save button fixed above navbar */
 .save-note-fixed {
   position: fixed;
-  bottom: 70px; /* sits above bottom nav */
+  bottom: 70px;
   left: 0;
   width: 100%;
   padding: 16px;
@@ -623,11 +636,18 @@ body {
   border: 1px solid rgba(255,255,255,0.2);
 }
 
-/* Transparent buttons with white text (kept from before) */
-.note-editor .ghost-button,
-.note-editor .icon-button,
-.note-editor .primary-button {
-  background: transparent !important;
-  color: inherit !important;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+/* Big delete button */
+.delete-note-fixed {
+  position: fixed;
+  bottom: 130px;
+  left: 0;
+  width: 100%;
+  padding: 14px;
+  border-radius: 0;
+  z-index: 9999;
+  background: rgba(255, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  color: #ff6b6b;
+  border: 1px solid rgba(255,0,0,0.3);
+  font-size: 15px;
 }

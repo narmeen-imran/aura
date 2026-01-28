@@ -374,7 +374,7 @@ on("delete-deck-button", "click", () => {
   showScreen("flashcards");
 });
 /* =========================================================
-   NOTES (FIXED)
+   NOTES (UPDATED)
 ========================================================= */
 
 function saveNotes() {
@@ -442,14 +442,9 @@ function openNoteEditor(index = null) {
   }
 }
 
-/* ⭐ THE TWO MISSING LISTENERS (THIS FIXES YOUR ISSUE) ⭐ */
-on("add-note-button", "click", () => {
-  openNoteEditor(null);
-});
-
-on("quick-note-button", "click", () => {
-  openNoteEditor(null);
-});
+/* OPEN NEW NOTE BUTTONS */
+on("add-note-button", "click", () => openNoteEditor(null));
+on("quick-note-button", "click", () => openNoteEditor(null));
 
 /* CLOSE EDITOR */
 on("close-note-editor", "click", () => {
@@ -498,22 +493,31 @@ on("save-note-button", "click", () => {
   noteEditorOverlay.style.display = "none";
 });
 
-/* DELETE NOTE */
+/* SMALL DELETE BUTTON */
 on("delete-note-button", "click", () => {
   const editing = noteEditorOverlay.dataset.editing;
   if (editing === "new") {
-    noteEditorOverlay.classList.remove("is-visible");
     noteEditorOverlay.style.display = "none";
     return;
   }
 
-  const index = Number(editing);
-  notes.splice(index, 1);
-
+  notes.splice(Number(editing), 1);
   saveNotes();
   renderNotes();
+  noteEditorOverlay.style.display = "none";
+});
 
-  noteEditorOverlay.classList.remove("is-visible");
+/* BIG DELETE BUTTON */
+on("delete-note-big", "click", () => {
+  const editing = noteEditorOverlay.dataset.editing;
+  if (editing === "new") {
+    noteEditorOverlay.style.display = "none";
+    return;
+  }
+
+  notes.splice(Number(editing), 1);
+  saveNotes();
+  renderNotes();
   noteEditorOverlay.style.display = "none";
 });
 
@@ -530,8 +534,9 @@ notesSearchInput.addEventListener("input", () => {
   renderNotes();
 });
 
-/* TOOLBAR */
+/* TOOLBAR — FIX KEYBOARD DROPPING */
 document.querySelectorAll(".toolbar-button").forEach(btn => {
+  btn.addEventListener("mousedown", e => e.preventDefault());
   btn.addEventListener("click", () => {
     const command = btn.dataset.command;
     const value = btn.dataset.value || null;
