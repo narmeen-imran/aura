@@ -11,6 +11,8 @@ window.addEventListener('load', () => {
 });
 
 
+
+
 function $(id) {
   return document.getElementById(id);
  }
@@ -32,6 +34,8 @@ function $(id) {
  let timerInterval = null;
  let totalSeconds = 1500;
  let remainingSeconds = 1500;
+
+
 
 
  const appRoot = $("app-root");
@@ -62,6 +66,8 @@ function $(id) {
  }
 
 
+
+
  function showScreen(name) {
   document.querySelectorAll(".aura-screen").forEach(screen => {
     screen.classList.remove("is-active");
@@ -69,6 +75,8 @@ function $(id) {
       screen.classList.add("is-active");
     }
   });
+
+
 
 
   document.querySelectorAll(".bottom-nav-item").forEach(btn => {
@@ -90,12 +98,16 @@ function $(id) {
  });
 
 
+
+
  on("onboarding-next-2", "click", () => {
   const age = $("onboarding-age-input").value.trim();
   if (!age) return;
  
   userAge = age;
   localStorage.setItem("aura-age", userAge);
+
+
 
 
   document.querySelector('[data-step="2"]').style.display = "none";
@@ -116,6 +128,8 @@ function $(id) {
  });
 
 
+
+
  document.querySelectorAll(".onboarding-back-button").forEach(btn => {
   btn.addEventListener("click", () => {
     const backStep = btn.dataset.backStep;
@@ -127,12 +141,16 @@ function $(id) {
  });
 
 
+
+
  document.querySelectorAll(".bottom-nav-item").forEach(btn => {
   btn.addEventListener("click", () => {
     const target = btn.dataset.screenTarget;
     if (target) showScreen(target);
   });
  });
+
+
 
 
  function saveTodos() {
@@ -154,6 +172,8 @@ function $(id) {
   });
 
 
+
+
   document.querySelectorAll(".todo-delete").forEach(btn => {
     btn.addEventListener("click", () => {
       const index = btn.dataset.index;
@@ -172,6 +192,8 @@ function $(id) {
   saveTodos();
   renderTodos();
  });
+
+
 
 
  function saveDecks() {
@@ -198,22 +220,11 @@ function $(id) {
   });
  }
  
- on("add-deck-button", "click", () => {
+on("add-deck-button", "click", () => {
   openGlobalModal("new deck", "name your deck", "deck");
-  if (!name) return;
- 
-  const trimmed = name.trim();
-  if (!trimmed) return;
- 
-  if (decks[trimmed]) {
-    alert("a deck with that name already exists.");
-    return;
-  }
- 
-  decks[trimmed] = [];
-  saveDecks();
-  renderDecks();
- });
+});
+
+
 
 
  function openDeck(name) {
@@ -253,6 +264,8 @@ function $(id) {
  });
 
 
+
+
  on("flashcard-next", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
@@ -263,6 +276,8 @@ function $(id) {
  });
 
 
+
+
  on("flashcard-prev", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
@@ -271,6 +286,8 @@ function $(id) {
   flashcard.classList.remove("is-flipped");
   renderFlashcard();
  });
+
+
 
 
  on("add-card-button", "click", () => {
@@ -284,9 +301,13 @@ function $(id) {
  });
 
 
+
+
  on("edit-card-button", "click", () => {
   const deck = decks[currentDeck];
   if (!deck.length) return;
+
+
 
 
   $("flashcard-modal-title").textContent = "edit card";
@@ -298,6 +319,8 @@ function $(id) {
   flashcardModal.dataset.mode = "edit";
   flashcardModal.classList.add("is-visible");
  });
+
+
 
 
  on("flashcard-modal-save", "click", () => {
@@ -324,6 +347,8 @@ function $(id) {
  });
 
 
+
+
  on("flashcard-modal-cancel", "click", () => {
   flashcardModal.classList.remove("is-visible");
  });
@@ -338,6 +363,8 @@ function $(id) {
   saveDecks();
   renderFlashcard();
  });
+
+
 
 
  on("rename-deck-button", "click", () => {
@@ -362,6 +389,8 @@ function $(id) {
  
   $("deck-viewer-title").textContent = trimmed;
  });
+
+
 
 
  on("delete-deck-button", "click", () => {
@@ -398,6 +427,8 @@ function $(id) {
     });
 
 
+
+
   filtered.forEach(n => {
     const card = document.createElement("div");
     card.className = "glass-card note-card";
@@ -409,7 +440,8 @@ function $(id) {
       <p>${preview}${preview.length === 80 ? "..." : ""}</p>
       ${n.tags ? `<p class="hint-text">${n.tags}</p>` : ""}
     `;
- let currentAction = null; 
+ let currentAction = null;
+
 
 function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-title").textContent = title;
@@ -420,10 +452,12 @@ function openGlobalModal(title, placeholder, actionType) {
     $("global-modal-input").focus();
 }
 
+
 // Logic for the Save/Cancel buttons
 on("global-modal-save", "click", () => {
     const val = $("global-modal-input").value.trim();
     if (!val) return;
+
 
     if (currentAction === "task") {
         todos.push(val);
@@ -451,7 +485,9 @@ on("global-modal-save", "click", () => {
     $("global-modal").classList.remove("is-visible");
 });
 
+
 on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-visible"));
+
 
     card.addEventListener("click", () => openNoteEditor(n.index));
     notesList.appendChild(card);
@@ -459,9 +495,13 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  }
 
 
+
+
  function openNoteEditor(index = null) {
   noteEditorOverlay.classList.add("is-visible");
   noteEditorOverlay.style.display = "flex";
+
+
 
 
   if (index === null) {
@@ -489,6 +529,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  on("quick-note-button", "click", () => {
   openNoteEditor(null);
  });
@@ -497,6 +539,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   noteEditorOverlay.classList.remove("is-visible");
   noteEditorOverlay.style.display = "none";
  });
+
+
 
 
  on("save-note-button", "click", () => {
@@ -540,6 +584,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  on("delete-note-button", "click", () => {
   const editing = noteEditorOverlay.dataset.editing;
   if (editing === "new") {
@@ -559,6 +605,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  on("pin-note-button", "click", () => {
   const pinned = pinNoteButton.dataset.pinned === "true";
   pinNoteButton.dataset.pinned = pinned ? "false" : "true";
@@ -566,10 +614,14 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  notesSearchInput.addEventListener("input", () => {
   noteSearchQuery = notesSearchInput.value.trim();
   renderNotes();
  });
+
+
 
 
  document.querySelectorAll(".toolbar-button").forEach(btn => {
@@ -595,6 +647,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  on("settings-change-name", "click", () => {
   openGlobalModal("change name", "new name", "name");
  
@@ -608,6 +662,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
     }
   }
  });
+
+
 
 
  function savePomodoroStats() {
@@ -636,11 +692,15 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  }
 
 
+
+
  function formatTime(sec) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
  }
+
+
 
 
  on("pomodoro-toggle", "click", () => {
@@ -681,6 +741,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  on("pomodoro-reset", "click", () => {
   clearInterval(timerInterval);
   timerInterval = null;
@@ -694,6 +756,8 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
  });
 
 
+
+
  function init() {
   renderTodos();
   renderDecks();
@@ -701,10 +765,14 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   renderPomodoroStats();
 
 
+
+
   const savedTheme = localStorage.getItem("aura-theme");
   if (savedTheme) {
     document.documentElement.setAttribute("data-theme", savedTheme);
   }
+
+
 
 
   if (userName) {
@@ -720,12 +788,18 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   }
 
 
+
+
   timerDisplay.textContent = formatTime(remainingSeconds);
   updateRing();
  }
 
 
+
+
  init();
+
+
 
 
 document.getElementById('settings-reset-app').addEventListener('click', () => {
@@ -734,6 +808,8 @@ document.getElementById('settings-reset-app').addEventListener('click', () => {
         window.location.reload();
     }
 });
+
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -750,3 +826,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+
+
+
+
+let currentAction = null; 
+
+// This function makes the popup appear
+function openGlobalModal(title, placeholder, actionType) {
+    $("global-modal-title").textContent = title;
+    $("global-modal-input").placeholder = placeholder;
+    $("global-modal-input").value = "";
+    currentAction = actionType;
+    $("global-modal").classList.add("is-visible");
+    $("global-modal-input").focus();
+}
+
+// This logic happens ONLY when you click "Confirm" in the box
+on("global-modal-save", "click", () => {
+    const val = $("global-modal-input").value.trim();
+    if (!val) return;
+
+    if (currentAction === "task") {
+        todos.push(val);
+        saveTodos(); 
+        renderTodos();
+    } else if (currentAction === "deck") {
+        if (!decks[val]) {
+            decks[val] = [];
+            saveDecks(); 
+            renderDecks();
+        }
+    } else if (currentAction === "name") {
+        userName = val;
+        localStorage.setItem("aura-username", val);
+        if($("home-greeting")) $("home-greeting").textContent = `hello, ${val}`;
+    }
+    $("global-modal").classList.remove("is-visible");
+});
+
+// This makes the "Cancel" button work
+on("global-modal-cancel", "click", () => {
+    $("global-modal").classList.remove("is-visible");
+});
