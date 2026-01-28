@@ -687,3 +687,13 @@
     font-weight: 700;
     transition: all 0.2s ease;
 }
+#splash-screen {
+    background: #000000;
+    opacity: 0;
+    animation: fadeInSplash 0.5s forwards;
+}
+
+@keyframes fadeInSplash {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
