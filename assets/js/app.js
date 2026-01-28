@@ -631,3 +631,10 @@ function $(id) {
  }
 
  init();
+
+document.getElementById('settings-reset-app').addEventListener('click', () => {
+    if (confirm("Are you absolutely sure? This will delete all your data and take you back to onboarding.")) {
+        localStorage.clear(); 
+        window.location.reload(); 
+    }
+});
