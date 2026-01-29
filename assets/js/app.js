@@ -67,7 +67,7 @@ function $(id) {
     btn.classList.toggle("is-active", btn.dataset.screenTarget === name);
   });
  }
- 
+ //splash screnn
  const onboardingScreen = $("onboarding-screen");
  
  on("onboarding-next-1", "click", () => {
@@ -213,7 +213,7 @@ on("add-deck-button", "click", () => {
   }
  
   const card = deck[currentCardIndex];
- 
+ //science flashcrad
   flashcardFront.textContent = card.front;
   flashcardBack.textContent = card.back;
   flashcardProgress.textContent = `${currentCardIndex + 1} / ${deck.length}`;
@@ -467,7 +467,7 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
     alert("note is empty.");
     return;
   }
- 
+ //will do tmrw
   const editing = noteEditorOverlay.dataset.editing;
  
   if (editing === "new") {
@@ -597,7 +597,7 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
-    $("pomodoro-toggle").textContent = "start";
+    $("pomodoro-toggle").textContent = "start"; 
     return;
   }
   if (remainingSeconds === totalSeconds) {
@@ -629,7 +629,7 @@ on("global-modal-cancel", "click", () => $("global-modal").classList.remove("is-
     }
   }, 1000);
  });
-
+// need to finish thiss
  on("pomodoro-reset", "click", () => {
   clearInterval(timerInterval);
   timerInterval = null;
